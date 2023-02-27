@@ -68,7 +68,6 @@ while True:
         if Y*Q<S:
             break
     if Q!=0:
-        print("Q positive")
         A=A+Q;S=S-Y*Q;C=0
     else:
         while True:
