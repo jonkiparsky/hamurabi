@@ -1,8 +1,10 @@
+import hamurabi
 from hamurabi import (
     national_fink,
     no_can_do,
     not_enough_acres,
     not_enough_bushels,
+    query_bushels_to_feed,
     so_long,
 )
 from pytest import (
@@ -33,3 +35,18 @@ def test_national_fink(capsys):
     with raises(SystemExit):
         national_fink(500)
     assert_in_stdout("STARVED 500 PEOPLE", capsys)
+
+class TestQueryBushelsToFeed():
+    def test_can_feed_less_than_current_holdings(self):
+        hamurabi.input = lambda: 5
+        Q = query_bushels_to_feed(10)
+        assert Q == 5
+
+    def test_exit_on_negative_input(self):
+        with raises(SystemExit):
+            hamurabi.input = lambda: -5
+            query_bushels_to_feed(10)
+
+    def test_cannot_feed_more_than_current_holdings(self):
+        # oops! trying to test this will get us into a loop!
+        pass

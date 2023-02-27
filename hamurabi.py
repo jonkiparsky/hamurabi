@@ -27,6 +27,19 @@ def national_fink(D):
     print("BEEN DECLARED NATIONAL FINK!!!")
     so_long()
 
+def query_bushels_to_feed(S):
+    while True:
+        print("HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE")
+        Q=int(input())
+        if Q<=0:
+            no_can_do()
+            so_long()
+            # TRYING TO USE MORE GRAIN THAN IN SILOS?
+        if Q<S:
+            break
+        else:
+            not_enough_bushels(S)
+    return Q
 
 def main():
     print("HAMMURABI".rjust(32))
@@ -78,21 +91,12 @@ def main():
                 if Q>=A:
                     not_enough_acres(A)
                 else:
+                    A=A-Q;S=S+Y*Q;C=0
                     break
-                A=A-Q;S=S+Y*Q;C=0
-                print()
-        while True:
-            print("HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE")
-            Q=int(input())
-            if Q<=0:
-                no_can_do()
-                so_long()
-                # TRYING TO USE MORE GRAIN THAN IN SILOS?
-            if Q<S:
-                break
-            else:
-                not_enough_bushels(S)
 
+                print()
+
+        Q = query_bushels_to_feed(S)
         S=S-Q;C=1;print()
         while True:
             print("HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED")
