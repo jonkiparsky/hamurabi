@@ -58,9 +58,9 @@ def main():
             break
         C=int(10*random());Y=C+17
         print("LAND IS TRADING AT "+str(Y)+" BUSHELS PER ACRE.")
-        print("HOW MANY ACRES DO YOU WISH TO BUY")
-        Q=int(input())
         while True:
+            print("HOW MANY ACRES DO YOU WISH TO BUY")
+            Q=int(input())
             if Q<0:
                 no_can_do()
                 so_long()
