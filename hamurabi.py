@@ -41,6 +41,39 @@ def query_bushels_to_feed(S):
             not_enough_bushels(S)
     return Q
 
+def query_acres_to_buy(Y, S):
+    # Y: Bushels per acre
+    # S: Current grain holdings in bushels
+    # Q: number of acres to buy @ Y bushels per acre
+    # Note: modification of S should happen here, but
+    # leaving it in the main flow for now to simplify extraction
+    print("LAND IS TRADING AT "+str(Y)+" BUSHELS PER ACRE.")
+    while True:
+        print("HOW MANY ACRES DO YOU WISH TO BUY")
+        Q=int(input())
+        if Q<0:
+            no_can_do()
+            so_long()
+        if Y*Q<S:
+            break
+    return Q
+
+def query_acres_to_sell(Y, A):
+    while True:
+        print("HOW MANY ACRES DO YOU WISH TO SELL")
+        Q = int(input())
+        if Q<0:
+            no_can_do()
+            so_long()
+        if Q>=A:
+            not_enough_acres(A)
+        else:
+            # A=A-Q;S=S+Y*Q;C=0
+            # leaving this calculation in main
+            # to simplify return
+            break
+    return Q
+
 def main():
     print("HAMMURABI".rjust(32))
     print("CREATIVE COMPUTING MORRISTOWN NEW JERSEY".rjust(15))
@@ -70,31 +103,13 @@ def main():
         if Z==11:
             break
         C=int(10*random());Y=C+17
-        print("LAND IS TRADING AT "+str(Y)+" BUSHELS PER ACRE.")
-        while True:
-            print("HOW MANY ACRES DO YOU WISH TO BUY")
-            Q=int(input())
-            if Q<0:
-                no_can_do()
-                so_long()
-            if Y*Q<S:
-                break
+        Q = query_acres_to_buy(Y, S)
         if Q!=0:
             A=A+Q;S=S-Y*Q;C=0
         else:
-            while True:
-                print("HOW MANY ACRES DO YOU WISH TO SELL")
-                Q = int(input())
-                if Q<0:
-                    no_can_do()
-                    so_long()
-                if Q>=A:
-                    not_enough_acres(A)
-                else:
-                    A=A-Q;S=S+Y*Q;C=0
-                    break
-
-                print()
+            Q = query_acres_to_sell(Y, A)
+            A=A-Q;S=S+Y*Q;C=0
+        print()
 
         Q = query_bushels_to_feed(S)
         S=S-Q;C=1;print()

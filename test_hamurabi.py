@@ -4,6 +4,8 @@ from hamurabi import (
     no_can_do,
     not_enough_acres,
     not_enough_bushels,
+    query_acres_to_buy,
+    query_acres_to_sell,
     query_bushels_to_feed,
     so_long,
 )
@@ -49,4 +51,35 @@ class TestQueryBushelsToFeed():
 
     def test_cannot_feed_more_than_current_holdings(self):
         # oops! trying to test this will get us into a loop!
+        pass
+
+class TestQueryAcresToBuy():
+    def test_can_spend_less_than_current_grain_holdings(self):
+        hamurabi.input = lambda: 5
+        acres_to_buy = query_acres_to_buy(1, 10)
+        assert acres_to_buy == 5
+
+    def test_cannot_buy_negative_acres(self):
+        with raises(SystemExit):
+            hamurabi.input = lambda: -5
+            acres_to_buy = query_acres_to_buy(1, 10)
+
+    def test_cannot_spend_more_than_current_grain_holdings(self):
+        # cannot test this now, due to loop
+        pass
+
+
+class TestQueryAcresToSell():
+    def test_can_sell_less_than_current_land_holdings(self):
+        hamurabi.input = lambda: 5
+        acres_to_sell = query_acres_to_sell(1, 10)
+        assert acres_to_sell == 5
+
+    def test_cannot_sell_negative_acres(self):
+        with raises(SystemExit):
+            hamurabi.input = lambda: -5
+            acres_to_sell = query_acres_to_sell(1, 10)
+
+    def test_cannot_sell_more_than_current_land_holdings(self):
+        # cannot test this now, due to loop
         pass
