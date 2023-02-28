@@ -6,6 +6,7 @@ from hamurabi import (
     not_enough_bushels,
     query_acres_to_buy,
     query_acres_to_sell,
+    query_acres_to_sow,
     query_bushels_to_feed,
     so_long,
 )
@@ -83,3 +84,34 @@ class TestQueryAcresToSell():
     def test_cannot_sell_more_than_current_land_holdings(self):
         # cannot test this now, due to loop
         pass
+
+class TestQueryAcresToSow():
+    def test_can_sow_less_than_current_land_holdings(self):
+        hamurabi.input = lambda: 5
+        acres_to_sow, grain_holdings = query_acres_to_sow(10, 100, 100)
+        assert acres_to_sow == 5
+
+    def test_sow_two_acres_per_bushel(self):
+        hamurabi.input = lambda: 6
+        acres_to_sow, grain_holdings = query_acres_to_sow(10, 3, 100)
+        assert grain_holdings == 0
+
+    def test_cannot_sow_without_enough_grain(self):
+        # cannot test this now, loop
+        pass
+
+    def test_not_enough_population_to_sow(self):
+        # cannot test this now, loop
+        pass
+
+    def test_cannot_sow_negative_acreage(self):
+        with raises(SystemExit):
+            hamurabi.input = lambda: -5
+            acres_to_sow, grain_holdings = query_acres_to_sow(10, 100, 100)
+
+    def test_can_sow_zero_acres(self):
+        user_input = 0
+        initial_acreage = 100
+        hamurabi.input = lambda: user_input
+        result = query_acres_to_sow(initial_acreage, 100, 100)
+        assert result == (user_input, initial_acreage)

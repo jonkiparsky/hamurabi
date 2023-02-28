@@ -28,6 +28,9 @@ def national_fink(D):
     so_long()
 
 def query_bushels_to_feed(S):
+    # S: current grain holdings in bushels
+    # returns Q = number of bushels to feed to population
+
     while True:
         print("HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE")
         Q=int(input())
@@ -44,7 +47,7 @@ def query_bushels_to_feed(S):
 def query_acres_to_buy(Y, S):
     # Y: Bushels per acre
     # S: Current grain holdings in bushels
-    # Q: number of acres to buy @ Y bushels per acre
+    # returns Q = number of acres to buy @ Y bushels per acre
     # Note: modification of S should happen here, but
     # leaving it in the main flow for now to simplify extraction
     print("LAND IS TRADING AT "+str(Y)+" BUSHELS PER ACRE.")
@@ -59,6 +62,9 @@ def query_acres_to_buy(Y, S):
     return Q
 
 def query_acres_to_sell(Y, A):
+    # Y: price of land in bushels per acre
+    # A: land owned in acres
+    # returns Q = number of acres to sell
     while True:
         print("HOW MANY ACRES DO YOU WISH TO SELL")
         Q = int(input())
@@ -73,6 +79,37 @@ def query_acres_to_sell(Y, A):
             # to simplify return
             break
     return Q
+
+def query_acres_to_sow(A, S, P):
+    # A: land owned in acres
+    # S: grain holdings in bushels
+    # P: population in people
+    # returns D = number of acres to sow and S = modified grain holdings
+    while True:
+        print("HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED")
+        D = int(input())
+        if D==0:
+            break
+        if D<0:
+            no_can_do()
+            so_long()
+        # ***TRYING TO PLANT MORE ACRES THAN YOU OWN?
+        if D>=A:
+            not_enough_acres(A)
+            continue
+
+        # ***ENOUGH GRAIN FOR SEED?
+        if int(D/2) > S:
+            not_enough_bushels(S)
+            continue
+        # ***ENOUGH PEOPLE TO TEND THE CROPS?
+        if D>=10*P:
+
+            print("BUT YOU HAVE ONLY "+str(P)+" PEOPLE TO TEND THE FIELDS! NOW THEN, ")
+            continue
+        S=S-int(D/2)
+        break
+    return D, S
 
 def main():
     print("HAMMURABI".rjust(32))
