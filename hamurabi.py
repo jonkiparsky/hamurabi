@@ -150,30 +150,8 @@ def main():
 
         Q = query_bushels_to_feed(S)
         S=S-Q;C=1;print()
-        while True:
-            print("HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED")
-            D = int(input())
-            if D==0:
-                break
-            if D<0:
-                no_can_do()
-                so_long()
-                # ***TRYING TO PLANT MORE ACRES THAN YOU OWN?
-            if D>=A:
-                not_enough_acres(A)
-                continue
-
-            # ***ENOUGH GRAIN FOR SEED?
-            if int(D/2) > S:
-                not_enough_bushels(S)
-                continue
-            # ***ENOUGH PEOPLE TO TEND THE CROPS?
-            if D>=10*P:
-
-                print("BUT YOU HAVE ONLY "+str(P)+" PEOPLE TO TEND THE FIELDS! NOW THEN, ")
-                continue
-            S=S-int(D/2)
-            break
+        D, S = query_acres_to_sow(A, S, P)
+        import pdb; pdb.set_trace()
         C = random_value()
 
 
@@ -183,9 +161,9 @@ def main():
         if int(C/2) == C/2:
             # *** THE RATS ARE RUNNING WILD!
             E = int(S/C)
-            S = S-E+H
-            C = random_value()
-            # ***LETS HAVE SOME BABIES  ### actually, this is immigration...
+        S = S-E+H
+        C = random_value()
+        # ***LETS HAVE SOME BABIES  ### actually, this is immigration...
         I=int(C*(20*A+S)/P/100+1)
         # ***HOW MANY PEOPLE HAD FULL BELLIES?
         C=int(Q/20)
