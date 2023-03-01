@@ -151,7 +151,6 @@ def main():
         Q = query_bushels_to_feed(S)
         S=S-Q;C=1;print()
         D, S = query_acres_to_sow(A, S, P)
-        import pdb; pdb.set_trace()
         C = random_value()
 
 
