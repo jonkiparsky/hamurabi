@@ -9,40 +9,37 @@ def so_long():
     print()
     exit()
 
-def not_enough_acres(A):  # line 720
-    print ("HAMMURABI: THINK AGAIN. YOU OWN ONLY "+ str(A)+ " ACRES. NOW THEN,")
+def not_enough_acres(acres_owned):  # line 720
+    print ("HAMMURABI: THINK AGAIN. YOU OWN ONLY "+ str(acres_owned)+ " ACRES. NOW THEN,")
 
-def not_enough_bushels(S):
+def not_enough_bushels(grain_holdings):
     print("HAMMURABI: THINK AGAIN. YOU HAVE ONLY")
-    print(str(S)+" BUSHELS OF GRAIN. NOW THEN, ")
+    print(str(grain_holdings)+" BUSHELS OF GRAIN. NOW THEN, ")
 
 def random_value():
     return int(random()*5)+1
 
-def national_fink(D):
+def national_fink(deaths_this_turn):
     print()
-    print("YOU STARVED "+str(D)+" PEOPLE IN ONE YEAR!!!")
+    print("YOU STARVED "+str(deaths_this_turn)+" PEOPLE IN ONE YEAR!!!")
     print( "DUE TO THIS EXTREME MISMANAGEMENT YOU HAVE NOT ONLY")
     print("BEEN IMPEACHED AND THROWN OUT OF OFFICE BUT YOU HAVE")
     print("BEEN DECLARED NATIONAL FINK!!!")
     so_long()
 
-def query_bushels_to_feed(S):
-    # S: current grain holdings in bushels
-    # returns Q = number of bushels to feed to population
+def query_bushels_to_feed(grain_holdings):
 
     while True:
         print("HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE")
-        Q=int(input())
-        if Q<=0:
+        bushels_allocated_to_populace = int(input())
+        if bushels_allocated_to_populace <= 0:
             no_can_do()
             so_long()
-            # TRYING TO USE MORE GRAIN THAN IN SILOS?
-        if Q<S:
+        if bushels_allocated_to_populace<grain_holdings:
             break
         else:
-            not_enough_bushels(S)
-    return Q
+            not_enough_bushels(grain_holdings)
+    return bushels_allocated_to_populace
 
 def query_acres_to_buy(yield_per_acre, grain_holdings):
     print("LAND IS TRADING AT "+str(yield_per_acre)+" BUSHELS PER ACRE.")
