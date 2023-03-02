@@ -216,30 +216,63 @@ def compute_harvest(acres_to_sow, grain_holdings):
 
 def main():
     print_intro()
-    D1=0; P1=0
-    Z=0;P=95;S=2800;H=3000;E=H-S
-    Y=3;A=H/Y;I=5;Q=1
-    D=0
+    cumulative_deaths = 0
+    avg_deaths_per_year = 0
+    current_year = 0
+    population = 95
+    grain_holdings = 2800
+    harvest = 3000
+    rat_lossage = harvest - grain_holdings
+    Y=3
+    acres_owned = harvest/Y
+    immigration = 5
+    Q=1
+    deaths_this_turn = 0
     while True:
-        Z, P = print_status_report(Z, D, I, P, Q, A, Y, E, S)
-        if Z==11:
+        current_year, population = print_status_report(current_year,
+                                                       deaths_this_turn,
+                                                       immigration,
+                                                       population, Q,
+                                                       acres_owned, Y,
+                                                       rat_lossage,
+                                                       grain_holdings)
+        if current_year==11:
             break
         C=int(10*random());Y=C+17
-        Q = query_acres_to_buy(Y, S)
+        Q = query_acres_to_buy(Y, grain_holdings)
         if Q!=0:
-            A=A+Q;S=S-Y*Q;C=0
+            acres_owned = acres_owned + Q
+            grain_holdings = grain_holdings - Y * Q
+            C=0
         else:
-            Q = query_acres_to_sell(A)
-            A=A-Q;S=S+Y*Q;C=0
+            Q = query_acres_to_sell(acres_owned)
+            acres_owned = acres_owned - Q
+            grain_holdings = grain_holdings + Y * Q
+            C=0
         print()
 
-        Q = query_bushels_to_feed(S)
-        S=S-Q;C=1;print()
-        D, S = query_acres_to_sow(A, S, P)
+        Q = query_bushels_to_feed(grain_holdings)
+        grain_holdings = grain_holdings - Q
+        C=1;print()
+        deaths_this_turn, grain_holdings = query_acres_to_sow(acres_owned, grain_holdings, population)
 
-        H, E, S, Y = compute_harvest(D, S)
-        I, Q, P, P1, D, D1 = compute_new_population(A, S, P, P1, D, D1, Z, Q)
+        harvest, rat_lossage, grain_holdings, Y = compute_harvest(deaths_this_turn, grain_holdings)
+        (immigration, Q,
+         population,
+         avg_deaths_per_year,
+         deaths_this_turn,
+         cumulative_deaths) = compute_new_population(acres_owned,
+                                                     grain_holdings,
+                                                     population,
+                                                     avg_deaths_per_year,
+                                                     deaths_this_turn,
+                                                     cumulative_deaths,
+                                                     current_year, Q)
 
-    print_end_result(P1, D1, A, P, D)
+    print_end_result(avg_deaths_per_year,
+                     cumulative_deaths,
+                     acres_owned,
+                     population,
+                     deaths_this_turn)
 if __name__== "__main__":
     main()
