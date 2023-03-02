@@ -111,74 +111,69 @@ def query_acres_to_sow(A, S, P):
         break
     return D, S
 
-def main():
+def print_intro():
     print("HAMMURABI".rjust(32))
     print("CREATIVE COMPUTING MORRISTOWN NEW JERSEY".rjust(15))
     print("\n"*2)
     print("TRY YOUR HAND AT GOVERNING ANCIENT SUMERIA")
     print("FOR A TEN YEAR TERM OF OFFICE")
     print()
-    D1=0; P1=0
-    Z=0;P=95;S=2800;H=3000;E=H-S
-    Y=3;A=H/Y;I=5;Q=1
-    D=0
-    while True:
-        print("\n"*2)
-        print("HAMMURABI I BEG TO REPORT TO YOU,")
-        Z=Z+1
-        print("IN YEAR "+str(Z)+", "+str(D)+" PEOPLE STARVED," + str(I) +" CAME TO THE CITY,")
-        P=P+I
-        if Q<=0:
-            P=int(P/2)
-            print("A HORRIBLE PLAGUE STRUCK! HALF THE PEOPLE DIED")
-
-        print("THE POPULATION IS NOW "+str(P))
-        print("THE CITY NOW OWNS "+str(A)+" ACRES.")
-        print("YOU HARVESTED "+str(Y)+" BUSHELS PER ACRE.")
-        print("RATS ATE "+str(E)+" BUSHELS.")
-        print("YOU NOW HAVE "+str(S)+" BUSHELS IN STORE.");print()
-        if Z==11:
-            break
-        C=int(10*random());Y=C+17
-        Q = query_acres_to_buy(Y, S)
-        if Q!=0:
-            A=A+Q;S=S-Y*Q;C=0
-        else:
-            Q = query_acres_to_sell(Y, A)
-            A=A-Q;S=S+Y*Q;C=0
-        print()
-
-        Q = query_bushels_to_feed(S)
-        S=S-Q;C=1;print()
-        D, S = query_acres_to_sow(A, S, P)
-        C = random_value()
 
 
-        # ***A BOUNTIFUL HARVEST!
-        Y = C; H=D*Y; E=0
-        C = random_value()
-        if int(C/2) == C/2:
-            # *** THE RATS ARE RUNNING WILD!
-            E = int(S/C)
-        S = S-E+H
-        C = random_value()
-        # ***LETS HAVE SOME BABIES  ### actually, this is immigration...
-        I=int(C*(20*A+S)/P/100+1)
-        # ***HOW MANY PEOPLE HAD FULL BELLIES?
-        C=int(Q/20)
-        # ***HORROR, 15% CHANCE OF PLAGUE
-        Q=int(10*(2*random()-.3))
-        if P<C:
-            continue
+def print_status_report(Z, D, I, P, Q, A, Y, E, S):
+    print("\n"*2)
+    print("HAMMURABI I BEG TO REPORT TO YOU,")
+    Z=Z+1
+    print("IN YEAR "+str(Z)+", "+str(D)+" PEOPLE STARVED," + str(I) +" CAME TO THE CITY,")
+    P=P+I
+    if Q<=0:
+        P=int(P/2)
+        print("A HORRIBLE PLAGUE STRUCK! HALF THE PEOPLE DIED")
 
-        # ***STARVE ENOUGH FOR IMPEACHMENT?
-        D=P-C
-        if D<=.45*P:
-            P1=((Z-1)*P1+D*100/P)/Z
-            P=C;D1=D1+D
-            continue
-        else:
-            national_fink(D)
+    print("THE POPULATION IS NOW "+str(P))
+    print("THE CITY NOW OWNS "+str(A)+" ACRES.")
+    print("YOU HARVESTED "+str(Y)+" BUSHELS PER ACRE.")
+    print("RATS ATE "+str(E)+" BUSHELS.")
+    print("YOU NOW HAVE "+str(S)+" BUSHELS IN STORE.");print()
+    return Z, P
+
+
+def compute_new_population(A, S, P, P1, D, D1, Z, Q):
+    # A: acres owned
+    # S: grain owned
+    # P: population
+    # P1: average # of deaths per year
+    # D: # of people died this turn?
+    # D1: Cumulative deaths
+    # Z: current year
+    # Q: # of bushels of grain allocated to feeding population
+    # returns
+    # I = number of immigrants next turn
+    # Q = indicates plague if negative
+    # P, P1, D, D1 = updated numbers as above
+
+    C = random_value()
+    # ***LETS HAVE SOME BABIES  ### actually, this is immigration...
+    I=int(C*(20*A+S)/P/100+1)
+    # ***HOW MANY PEOPLE HAD FULL BELLIES?
+    C=int(Q/20)
+    # ***HORROR, 15% CHANCE OF PLAGUE
+    # even more horrifying, we reassign Q to a whole new purpose here
+    # now it means the chance of plague
+    Q=int(10*(2*random()-.3))
+    if P<C:
+        return I, Q, P, P1, D, D1
+    # ***STARVE ENOUGH FOR IMPEACHMENT?
+    D=P-C
+    if D<=.45*P:
+        P1=((Z-1)*P1+D*100/P)/Z
+        P=C;D1=D1+D
+    else:
+        national_fink(D)
+    return I, Q, P, P1, D, D1
+
+
+def print_end_result(P1, D1, A, P, D):
 
     print( "IN YOUR TEN-YEAR TERM OF OFFICE, "+str(P1)+" PERCENT OF THE")
     print( "POPULATION STARVED PER YEAR ON AVERAGE, I.E. A TOTAL OF")
@@ -207,5 +202,46 @@ def main():
     print( "JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!")
     so_long()
 
+def compute_harvest(D, S):
+    # D: acres to sow
+    # S: grain owned in bushels
+
+    C = random_value()
+    # ***A BOUNTIFUL HARVEST!
+    Y = C; H=D*Y; E=0
+    C = random_value()
+    if int(C/2) == C/2:
+        # *** THE RATS ARE RUNNING WILD!
+        E = int(S/C)
+    S = S-E+H
+    return H, E, S, Y
+
+def main():
+    print_intro()
+    D1=0; P1=0
+    Z=0;P=95;S=2800;H=3000;E=H-S
+    Y=3;A=H/Y;I=5;Q=1
+    D=0
+    while True:
+        Z, P = print_status_report(Z, D, I, P, Q, A, Y, E, S)
+        if Z==11:
+            break
+        C=int(10*random());Y=C+17
+        Q = query_acres_to_buy(Y, S)
+        if Q!=0:
+            A=A+Q;S=S-Y*Q;C=0
+        else:
+            Q = query_acres_to_sell(Y, A)
+            A=A-Q;S=S+Y*Q;C=0
+        print()
+
+        Q = query_bushels_to_feed(S)
+        S=S-Q;C=1;print()
+        D, S = query_acres_to_sow(A, S, P)
+
+        H, E, S, Y = compute_harvest(D, S)
+        I, Q, P, P1, D, D1 = compute_new_population(A, S, P, P1, D, D1, Z, Q)
+
+    print_end_result(P1, D1, A, P, D)
 if __name__== "__main__":
     main()

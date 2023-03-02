@@ -1,9 +1,14 @@
 import hamurabi
 from hamurabi import (
+    compute_harvest,
+    compute_new_population,
     national_fink,
     no_can_do,
     not_enough_acres,
     not_enough_bushels,
+    print_end_result,
+    print_intro,
+    print_status_report,
     query_acres_to_buy,
     query_acres_to_sell,
     query_acres_to_sow,
@@ -17,6 +22,10 @@ from pytest import (
 def assert_in_stdout(expected, captured):
     stdout, _ = captured.readouterr()
     assert expected in stdout
+
+def assert_not_in_stdout(unexpected, captured):
+    stdout, _ = captured.readouterr()
+    assert unexpected not in stdout
 
 def test_so_long():
     with raises(SystemExit):
@@ -38,6 +47,16 @@ def test_national_fink(capsys):
     with raises(SystemExit):
         national_fink(500)
     assert_in_stdout("STARVED 500 PEOPLE", capsys)
+
+def test_print_end_result(capsys):
+    # not much of a test, but it means the function can run
+    with raises(SystemExit):
+        print_end_result(1,2,3,4,5)
+        assert_in_stdout("IN YOUR TEN-YEAR TERM", capsys)
+
+def test_print_intro(capsys):
+    print_intro()
+    assert_in_stdout("CREATIVE COMPUTING MORRISTOWN", capsys)
 
 class TestQueryBushelsToFeed():
     def test_can_feed_less_than_current_holdings(self):
@@ -115,3 +134,110 @@ class TestQueryAcresToSow():
         hamurabi.input = lambda: user_input
         result = query_acres_to_sow(initial_acreage, 100, 100)
         assert result == (user_input, initial_acreage)
+
+class TestPrintStatusReport():
+    def arguments(self, arg_updates=None):
+        argnames = "Z, D, I, P, Q, A, Y, E, S".split(", ")
+        vals = [1, 20, 10, 90, 1, 500, 6, 70, 1000]
+        args_dict = dict(zip(argnames, vals))
+        if arg_updates:
+            args_dict.update(arg_updates)
+        return args_dict
+
+
+    def test_year(self, capsys):
+        Z, P = print_status_report(**self.arguments())
+        assert_in_stdout("IN YEAR 2", capsys)
+        assert Z == 2
+
+    def test_starved(self, capsys):
+        print_status_report(**self.arguments())
+        assert_in_stdout("20 PEOPLE STARVED", capsys)
+
+    def test_immigration(self, capsys):
+        print_status_report(**self.arguments())
+        assert_in_stdout("10 CAME TO THE CITY", capsys)
+
+    def test_plague(self, capsys):
+        Q = 0
+        I = 10
+        old_pop = 100
+        _, new_pop = print_status_report(**self.arguments({"Q": Q, "I": I, "P":old_pop}))
+        assert_in_stdout("A HORRIBLE PLAGUE", capsys)
+        assert new_pop == int((old_pop + I)/2)
+
+    def test_no_plague(self, capsys):
+        print_status_report(**self.arguments())
+        assert_not_in_stdout("A HORRIBLE PLAGUE", capsys)
+
+    def test_population(self, capsys):
+        I = 10
+        old_pop = 90
+        arg_updates = {"I": I, "P": old_pop}
+        _, new_pop = print_status_report(**self.arguments(arg_updates))
+        expected_new_population = old_pop + I
+        assert_in_stdout("POPULATION IS NOW {}".format(expected_new_population), capsys)
+        assert new_pop == expected_new_population
+
+    def test_acres_owned(self, capsys):
+        print_status_report(**self.arguments())
+        assert_in_stdout("NOW OWNS 500 ACRES", capsys)
+
+    def test_rats_ate(self, capsys):
+        print_status_report(**self.arguments())
+        assert_in_stdout("RATS ATE 70 BUSHELS", capsys)
+
+    def test_bushels_in_store(self, capsys):
+        print_status_report(**self.arguments())
+        assert_in_stdout("NOW HAVE 1000 BUSHELS IN STORE", capsys)
+
+class TestComputeHarvest:
+    def test_harvest_no_rats(self):
+        hamurabi.random_value = lambda: 3
+        sown = 1000
+        stored = 100
+        H, E, S, Y = compute_harvest(sown, stored)
+        assert H == 3000
+        assert E == 0
+        assert S == stored - E + H
+
+    def test_harvest_with_rats(self):
+        hamurabi.random_value = lambda: 2  # even number means rats
+        sown = 1000
+        stored = 100
+        H, E, S, Y = compute_harvest(sown, stored)
+        assert H == 2000
+        assert E == 50
+        assert S == stored - E + H
+
+class TestComputeNewPopulation:
+    def arguments(self, arg_updates=None):
+        argnames = "A, S, P, P1, D, D1, Z, Q".split(", ")
+        vals = [1000, 2000, 100, 4, 2, 4, 2, 2000]
+        args_dict = dict(zip(argnames, vals))
+        if arg_updates:
+            args_dict.update(arg_updates)
+        return args_dict
+
+
+    def test_immigration(self):
+        hamurabi.random_value = lambda: 2
+        I = compute_new_population(**self.arguments())[0]
+        assert I == 5
+
+    def test_plague(self):
+        hamurabi.random = lambda: 0.15
+        Q = compute_new_population(**self.arguments())[1]
+        assert Q == 0
+
+    def test_starve(self):
+        updated = {"Q": 1900}
+        P1, D, D1 = compute_new_population(**self.arguments(updated))[3:]
+        assert D == 5
+        assert D1 == 9
+        assert P1 == 4.5
+
+    def test_starve_with_impeachment(self):
+        updated = {"Q": 700}
+        with raises(SystemExit):
+            compute_new_population(**self.arguments(updated))
