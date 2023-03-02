@@ -80,36 +80,36 @@ def query_acres_to_sell(Y, A):
             break
     return Q
 
-def query_acres_to_sow(A, S, P):
+def query_acres_to_sow(acres_owned, grain_holdings, population):
     # A: land owned in acres
     # S: grain holdings in bushels
     # P: population in people
     # returns D = number of acres to sow and S = modified grain holdings
     while True:
         print("HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED")
-        D = int(input())
-        if D==0:
+        acres_to_sow = int(input())
+        if acres_to_sow == 0:
             break
-        if D<0:
+        if acres_to_sow<0:
             no_can_do()
             so_long()
         # ***TRYING TO PLANT MORE ACRES THAN YOU OWN?
-        if D>=A:
-            not_enough_acres(A)
+        if acres_to_sow>=acres_owned:
+            not_enough_acres(acres_owned)
             continue
 
         # ***ENOUGH GRAIN FOR SEED?
-        if int(D/2) > S:
-            not_enough_bushels(S)
+        if int(acres_to_sow / 2) > grain_holdings:
+            not_enough_bushels(grain_holdings)
             continue
         # ***ENOUGH PEOPLE TO TEND THE CROPS?
-        if D>=10*P:
+        if acres_to_sow >= 10 * population:
 
-            print("BUT YOU HAVE ONLY "+str(P)+" PEOPLE TO TEND THE FIELDS! NOW THEN, ")
+            print("BUT YOU HAVE ONLY " + str(population) + " PEOPLE TO TEND THE FIELDS! NOW THEN, ")
             continue
-        S=S-int(D/2)
+        grain_holdings = grain_holdings - int(acres_to_sow / 2)
         break
-    return D, S
+    return acres_to_sow, grain_holdings
 
 def print_intro():
     print("HAMMURABI".rjust(32))
