@@ -44,22 +44,17 @@ def query_bushels_to_feed(S):
             not_enough_bushels(S)
     return Q
 
-def query_acres_to_buy(Y, S):
-    # Y: Bushels per acre
-    # S: Current grain holdings in bushels
-    # returns Q = number of acres to buy @ Y bushels per acre
-    # Note: modification of S should happen here, but
-    # leaving it in the main flow for now to simplify extraction
-    print("LAND IS TRADING AT "+str(Y)+" BUSHELS PER ACRE.")
+def query_acres_to_buy(yield_per_acre, grain_holdings):
+    print("LAND IS TRADING AT "+str(yield_per_acre)+" BUSHELS PER ACRE.")
     while True:
         print("HOW MANY ACRES DO YOU WISH TO BUY")
-        Q=int(input())
-        if Q<0:
+        acres_to_buy = int(input())
+        if acres_to_buy < 0:
             no_can_do()
             so_long()
-        if Y*Q<S:
+        if yield_per_acre * acres_to_buy < grain_holdings:
             break
-    return Q
+    return acres_to_buy
 
 def query_acres_to_sell(acres_owned):
     # Y: price of land in bushels per acre
