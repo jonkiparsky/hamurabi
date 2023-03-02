@@ -173,27 +173,29 @@ def compute_new_population(A, S, P, P1, D, D1, Z, Q):
     return I, Q, P, P1, D, D1
 
 
-def print_end_result(P1, D1, A, P, D):
+def print_end_result(avg_deaths_per_year, cumulative_deaths,
+                     acres_owned, population, deaths_this_turn):
 
-    print( "IN YOUR TEN-YEAR TERM OF OFFICE, "+str(P1)+" PERCENT OF THE")
+    print( "IN YOUR TEN-YEAR TERM OF OFFICE, " +str(avg_deaths_per_year)+ " PERCENT OF THE")
     print( "POPULATION STARVED PER YEAR ON AVERAGE, I.E. A TOTAL OF")
-    print( str(D1)+" PEOPLE DIED!!"); L=A/P
+    print( str(cumulative_deaths)+" PEOPLE DIED!!")
+    acres_per_person = acres_owned / population
     print( "YOU STARTED WITH 10 ACRES PER PERSON AND ENDED WITH")
-    print( str(L)+" ACRES PER PERSON.")
+    print( str(acres_per_person)+" ACRES PER PERSON.")
     print()
-    if P1>33:
-        national_fink(D)
-    if L<7:
-        national_fink(D)
-    if P1>10:
+    if avg_deaths_per_year > 33:
+        national_fink(deaths_this_turn)
+    if acres_per_person < 7:
+        national_fink(deaths_this_turn)
+    if avg_deaths_per_year > 10:
         print( "YOUR HEAVY-HANDED PERFORMANCE SMACKS OF NERO AND IVAN IV")
         print( "THE PEOPLE (REMAINING) FIND YOU AN UNPLEASANT RULER AND")
         print( "FRANKLY, HATE YOUR GUTS!")
         so_long()
 
-    if P1>3 or L<10:
+    if avg_deaths_per_year > 3 or acres_per_person < 10:
         print( "YOUR PERFORMANCE COULD HAVE BEEN SOMEWHAT BETTER, BUT")
-        print( "REALLY, WASN'T TOO BAD AT ALL. "+ str(int(P*.8*random()))+" PEOPLE")
+        print( "REALLY, WASN'T TOO BAD AT ALL. "+ str(int(population * .8 * random()))+" PEOPLE")
         print( "DEARLY LIKE TO SEE YOU ASSASSINATED, BUT WE ALL HAVE OUR")
         print( "TRIVIAL PROBLEMS.")
         so_long()
