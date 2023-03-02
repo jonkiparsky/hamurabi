@@ -92,13 +92,13 @@ class TestQueryAcresToBuy():
 class TestQueryAcresToSell():
     def test_can_sell_less_than_current_land_holdings(self):
         hamurabi.input = lambda: 5
-        acres_to_sell = query_acres_to_sell(1, 10)
+        acres_to_sell = query_acres_to_sell(10)
         assert acres_to_sell == 5
 
     def test_cannot_sell_negative_acres(self):
         with raises(SystemExit):
             hamurabi.input = lambda: -5
-            acres_to_sell = query_acres_to_sell(1, 10)
+            acres_to_sell = query_acres_to_sell(10)
 
     def test_cannot_sell_more_than_current_land_holdings(self):
         # cannot test this now, due to loop

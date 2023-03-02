@@ -61,24 +61,21 @@ def query_acres_to_buy(Y, S):
             break
     return Q
 
-def query_acres_to_sell(Y, A):
+def query_acres_to_sell(acres_owned):
     # Y: price of land in bushels per acre
     # A: land owned in acres
     # returns Q = number of acres to sell
     while True:
         print("HOW MANY ACRES DO YOU WISH TO SELL")
-        Q = int(input())
-        if Q<0:
+        acres_to_sell = int(input())
+        if acres_to_sell < 0:
             no_can_do()
             so_long()
-        if Q>=A:
-            not_enough_acres(A)
+        if acres_to_sell >= acres_owned:
+            not_enough_acres(acres_owned)
         else:
-            # A=A-Q;S=S+Y*Q;C=0
-            # leaving this calculation in main
-            # to simplify return
             break
-    return Q
+    return acres_to_sell
 
 def query_acres_to_sow(acres_owned, grain_holdings, population):
     # A: land owned in acres
@@ -240,7 +237,7 @@ def main():
         if Q!=0:
             A=A+Q;S=S-Y*Q;C=0
         else:
-            Q = query_acres_to_sell(Y, A)
+            Q = query_acres_to_sell(A)
             A=A-Q;S=S+Y*Q;C=0
         print()
 
