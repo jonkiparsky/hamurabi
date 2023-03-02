@@ -202,19 +202,16 @@ def print_end_result(P1, D1, A, P, D):
     print( "JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!")
     so_long()
 
-def compute_harvest(D, S):
-    # D: acres to sow
-    # S: grain owned in bushels
-
-    C = random_value()
-    # ***A BOUNTIFUL HARVEST!
-    Y = C; H=D*Y; E=0
+def compute_harvest(acres_to_sow, grain_holdings):
+    yield_per_acre = random_value()
+    harvest = acres_to_sow * yield_per_acre
+    bushels_eaten = 0
     C = random_value()
     if int(C/2) == C/2:
         # *** THE RATS ARE RUNNING WILD!
-        E = int(S/C)
-    S = S-E+H
-    return H, E, S, Y
+        bushels_eaten = int(grain_holdings / C)
+    grain_holdings = grain_holdings - bushels_eaten + harvest
+    return harvest, bushels_eaten, grain_holdings, yield_per_acre
 
 def main():
     print_intro()
