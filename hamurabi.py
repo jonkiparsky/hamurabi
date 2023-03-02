@@ -138,39 +138,39 @@ def print_status_report(Z, D, I, P, Q, A, Y, E, S):
     return Z, P
 
 
-def compute_new_population(A, S, P, P1, D, D1, Z, Q):
-    # A: acres owned
-    # S: grain owned
-    # P: population
-    # P1: average # of deaths per year
-    # D: # of people died this turn?
-    # D1: Cumulative deaths
-    # Z: current year
-    # Q: # of bushels of grain allocated to feeding population
-    # returns
-    # I = number of immigrants next turn
-    # Q = indicates plague if negative
-    # P, P1, D, D1 = updated numbers as above
+def compute_new_population(acres_owned,
+                           grain_holdings,
+                           population,
+                           avg_deaths_per_year,
+                           deaths_this_turn,
+                           cumulative_deaths,
+                           current_year,
+                           bushels_to_feed):
 
-    C = random_value()
     # ***LETS HAVE SOME BABIES  ### actually, this is immigration...
-    I=int(C*(20*A+S)/P/100+1)
+    immigration = int(random_value() * (20 * acres_owned + grain_holdings) / population / 100 + 1)
     # ***HOW MANY PEOPLE HAD FULL BELLIES?
-    C=int(Q/20)
+    population_fed = int(bushels_to_feed / 20)
     # ***HORROR, 15% CHANCE OF PLAGUE
-    # even more horrifying, we reassign Q to a whole new purpose here
-    # now it means the chance of plague
-    Q=int(10*(2*random()-.3))
-    if P<C:
-        return I, Q, P, P1, D, D1
+    plague_quotient = int( 10 * (2 * random() -.3 ))
+    if population < population_fed:
+        return (immigration, plague_quotient, population,
+                avg_deaths_per_year, deaths_this_turn, cumulative_deaths)
     # ***STARVE ENOUGH FOR IMPEACHMENT?
-    D=P-C
-    if D<=.45*P:
-        P1=((Z-1)*P1+D*100/P)/Z
-        P=C;D1=D1+D
+    deaths_this_turn = population - population_fed
+    if deaths_this_turn <= .45 * population:
+        avg_deaths_per_year=((current_year - 1) * avg_deaths_per_year +
+                             deaths_this_turn * 100 / population) / current_year
+        population = population_fed
+        cumulative_deaths = cumulative_deaths + deaths_this_turn
     else:
-        national_fink(D)
-    return I, Q, P, P1, D, D1
+        national_fink(deaths_this_turn)
+    return (immigration,
+            plague_quotient,
+            population,
+            avg_deaths_per_year,
+            deaths_this_turn,
+            cumulative_deaths)
 
 
 def print_end_result(avg_deaths_per_year, cumulative_deaths,

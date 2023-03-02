@@ -196,48 +196,59 @@ class TestComputeHarvest:
         hamurabi.random_value = lambda: 3
         sown = 1000
         stored = 100
-        H, E, S, Y = compute_harvest(sown, stored)
-        assert H == 3000
-        assert E == 0
-        assert S == stored - E + H
+        harvest, bushels_eaten, grain_holdings, _ = compute_harvest(sown,
+                                                                    stored)
+        assert harvest == 3000
+        assert bushels_eaten == 0
+        assert grain_holdings == stored - bushels_eaten + harvest
 
     def test_harvest_with_rats(self):
         hamurabi.random_value = lambda: 2  # even number means rats
         sown = 1000
         stored = 100
-        H, E, S, Y = compute_harvest(sown, stored)
-        assert H == 2000
-        assert E == 50
-        assert S == stored - E + H
+        harvest, bushels_eaten, grain_holdings, _ = compute_harvest(sown, stored)
+        assert harvest == 2000
+        assert bushels_eaten == 50
+        assert grain_holdings == stored - bushels_eaten + harvest
 
 class TestComputeNewPopulation:
     def arguments(self, arg_updates=None):
-        argnames = "A, S, P, P1, D, D1, Z, Q".split(", ")
+        argnames = """acres_owned
+        grain_holdings
+        population
+        avg_deaths_per_year
+        deaths_this_turn
+        cumulative_deaths
+        current_year
+        bushels_to_feed""".split()
+
         vals = [1000, 2000, 100, 4, 2, 4, 2, 2000]
         args_dict = dict(zip(argnames, vals))
         if arg_updates:
             args_dict.update(arg_updates)
         return args_dict
 
-
     def test_immigration(self):
         hamurabi.random_value = lambda: 2
-        I = compute_new_population(**self.arguments())[0]
-        assert I == 5
+        immigration = compute_new_population(**self.arguments())[0]
+        assert immigration == 5
 
     def test_plague(self):
         hamurabi.random = lambda: 0.15
-        Q = compute_new_population(**self.arguments())[1]
-        assert Q == 0
+        plague_quotient = compute_new_population(**self.arguments())[1]
+        assert plague_quotient == 0
 
     def test_starve(self):
-        updated = {"Q": 1900}
-        P1, D, D1 = compute_new_population(**self.arguments(updated))[3:]
-        assert D == 5
-        assert D1 == 9
-        assert P1 == 4.5
+        updated = {"bushels_to_feed": 1900}
+        (avg_deaths_per_year,
+         deaths_this_turn,
+         cumulative_deaths) = compute_new_population(
+            **self.arguments(updated))[3:]
+        assert deaths_this_turn == 5
+        assert cumulative_deaths == 9
+        assert avg_deaths_per_year == 4.5
 
     def test_starve_with_impeachment(self):
-        updated = {"Q": 700}
+        updated = {"bushels_to_feed": 700}
         with raises(SystemExit):
             compute_new_population(**self.arguments(updated))
