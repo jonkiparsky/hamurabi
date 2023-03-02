@@ -120,22 +120,32 @@ def print_intro():
     print()
 
 
-def print_status_report(Z, D, I, P, Q, A, Y, E, S):
-    print("\n"*2)
+def print_status_report(current_year,
+                        deaths_this_turn,
+                        immigration,
+                        population,
+                        plague_quotient,
+                        acres_owned,
+                        yield_per_acre,
+                        bushels_eaten,
+                        grain_holdings):
+    print("\n\n")
     print("HAMMURABI I BEG TO REPORT TO YOU,")
-    Z=Z+1
-    print("IN YEAR "+str(Z)+", "+str(D)+" PEOPLE STARVED," + str(I) +" CAME TO THE CITY,")
-    P=P+I
-    if Q<=0:
-        P=int(P/2)
+    current_year = current_year + 1
+    print("IN YEAR "+str(current_year) +
+          ", " + str(deaths_this_turn) + " PEOPLE STARVED,"
+          + str(immigration) +" CAME TO THE CITY,")
+    population=population+immigration
+    if plague_quotient <= 0:
+        population=int(population / 2)
         print("A HORRIBLE PLAGUE STRUCK! HALF THE PEOPLE DIED")
 
-    print("THE POPULATION IS NOW "+str(P))
-    print("THE CITY NOW OWNS "+str(A)+" ACRES.")
-    print("YOU HARVESTED "+str(Y)+" BUSHELS PER ACRE.")
-    print("RATS ATE "+str(E)+" BUSHELS.")
-    print("YOU NOW HAVE "+str(S)+" BUSHELS IN STORE.");print()
-    return Z, P
+    print("THE POPULATION IS NOW "+str(population))
+    print("THE CITY NOW OWNS "+str(acres_owned)+" ACRES.")
+    print("YOU HARVESTED "+str(yield_per_acre)+" BUSHELS PER ACRE.")
+    print("RATS ATE "+str(bushels_eaten)+" BUSHELS.")
+    print("YOU NOW HAVE "+str(grain_holdings)+" BUSHELS IN STORE.");print()
+    return current_year, population
 
 
 def compute_new_population(acres_owned,

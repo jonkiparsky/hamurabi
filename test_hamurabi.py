@@ -137,7 +137,15 @@ class TestQueryAcresToSow():
 
 class TestPrintStatusReport():
     def arguments(self, arg_updates=None):
-        argnames = "Z, D, I, P, Q, A, Y, E, S".split(", ")
+        argnames = """current_year
+        deaths_this_turn
+        immigration
+        population
+        plague_quotient
+        acres_owned
+        yield_per_acre
+        bushels_eaten
+        grain_holdings""".split()
         vals = [1, 20, 10, 90, 1, 500, 6, 70, 1000]
         args_dict = dict(zip(argnames, vals))
         if arg_updates:
@@ -146,9 +154,9 @@ class TestPrintStatusReport():
 
 
     def test_year(self, capsys):
-        Z, P = print_status_report(**self.arguments())
+        current_year, population = print_status_report(**self.arguments())
         assert_in_stdout("IN YEAR 2", capsys)
-        assert Z == 2
+        assert current_year == 2
 
     def test_starved(self, capsys):
         print_status_report(**self.arguments())
@@ -159,23 +167,24 @@ class TestPrintStatusReport():
         assert_in_stdout("10 CAME TO THE CITY", capsys)
 
     def test_plague(self, capsys):
-        Q = 0
-        I = 10
+        plague_quotient = 0
+        immigration = 10
         old_pop = 100
-        _, new_pop = print_status_report(**self.arguments({"Q": Q, "I": I, "P":old_pop}))
+        _, new_pop = print_status_report(**self.arguments({"plague_quotient": plague_quotient,
+                                                           "immigration": immigration, "population":old_pop}))
         assert_in_stdout("A HORRIBLE PLAGUE", capsys)
-        assert new_pop == int((old_pop + I)/2)
+        assert new_pop == int((old_pop + immigration)/2)
 
     def test_no_plague(self, capsys):
         print_status_report(**self.arguments())
         assert_not_in_stdout("A HORRIBLE PLAGUE", capsys)
 
     def test_population(self, capsys):
-        I = 10
+        immigration = 10
         old_pop = 90
-        arg_updates = {"I": I, "P": old_pop}
+        arg_updates = {"immigration": immigration, "population": old_pop}
         _, new_pop = print_status_report(**self.arguments(arg_updates))
-        expected_new_population = old_pop + I
+        expected_new_population = old_pop + immigration
         assert_in_stdout("POPULATION IS NOW {}".format(expected_new_population), capsys)
         assert new_pop == expected_new_population
 
