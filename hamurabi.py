@@ -223,41 +223,46 @@ def main():
     grain_holdings = 2800
     harvest = 3000
     rat_lossage = harvest - grain_holdings
-    Y=3
-    acres_owned = harvest/Y
+    yield_per_acre=3
+    acres_owned = harvest/yield_per_acre
     immigration = 5
-    Q=1
+    plague_quotient = 1
     deaths_this_turn = 0
     while True:
         current_year, population = print_status_report(current_year,
                                                        deaths_this_turn,
                                                        immigration,
-                                                       population, Q,
-                                                       acres_owned, Y,
+                                                       population,
+                                                       plague_quotient,
+                                                       acres_owned, yield_per_acre,
                                                        rat_lossage,
                                                        grain_holdings)
         if current_year==11:
             break
-        C=int(10*random());Y=C+17
-        Q = query_acres_to_buy(Y, grain_holdings)
-        if Q!=0:
-            acres_owned = acres_owned + Q
-            grain_holdings = grain_holdings - Y * Q
+        C=int(10*random());yield_per_acre=C+17
+        acres_to_buy = query_acres_to_buy(yield_per_acre, grain_holdings)
+        if acres_to_buy != 0:
+            acres_owned = acres_owned + acres_to_buy
+            grain_holdings = grain_holdings - yield_per_acre * acres_to_buy
             C=0
         else:
-            Q = query_acres_to_sell(acres_owned)
-            acres_owned = acres_owned - Q
-            grain_holdings = grain_holdings + Y * Q
+            acres_to_sell = query_acres_to_sell(acres_owned)
+            acres_owned = acres_owned - acres_to_sell
+            grain_holdings = grain_holdings + yield_per_acre * acres_to_sell
             C=0
         print()
 
-        Q = query_bushels_to_feed(grain_holdings)
-        grain_holdings = grain_holdings - Q
+        bushels_to_feed = query_bushels_to_feed(grain_holdings)
+        grain_holdings = grain_holdings - bushels_to_feed
         C=1;print()
-        deaths_this_turn, grain_holdings = query_acres_to_sow(acres_owned, grain_holdings, population)
+        deaths_this_turn, grain_holdings = query_acres_to_sow(acres_owned,
+                                                          grain_holdings,
+                                                          population)
 
-        harvest, rat_lossage, grain_holdings, Y = compute_harvest(deaths_this_turn, grain_holdings)
-        (immigration, Q,
+        harvest, rat_lossage, grain_holdings, yield_per_acre = compute_harvest(deaths_this_turn,
+                                                                               grain_holdings)
+        (immigration,
+         plague_quotient,
          population,
          avg_deaths_per_year,
          deaths_this_turn,
@@ -267,7 +272,8 @@ def main():
                                                      avg_deaths_per_year,
                                                      deaths_this_turn,
                                                      cumulative_deaths,
-                                                     current_year, Q)
+                                                     current_year,
+                                                     bushels_to_feed)
 
     print_end_result(avg_deaths_per_year,
                      cumulative_deaths,
