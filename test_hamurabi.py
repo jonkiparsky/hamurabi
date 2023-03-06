@@ -2,12 +2,12 @@ import hamurabi
 from hamurabi import (
     compute_harvest,
     compute_new_population,
+    Hamurabi,
     national_fink,
     no_can_do,
     not_enough_acres,
     not_enough_bushels,
     print_end_result,
-    print_intro,
     print_status_report,
     query_acres_to_buy,
     query_acres_to_sell,
@@ -55,7 +55,8 @@ def test_print_end_result(capsys):
         assert_in_stdout("IN YOUR TEN-YEAR TERM", capsys)
 
 def test_print_intro(capsys):
-    print_intro()
+    instance = Hamurabi()
+    instance.print_intro()
     assert_in_stdout("CREATIVE COMPUTING MORRISTOWN", capsys)
 
 class TestQueryBushelsToFeed():
