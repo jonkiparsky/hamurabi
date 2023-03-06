@@ -146,7 +146,7 @@ class TestPrintStatusReport():
         instance.plague_quotient = 1
         instance.acres_owned = 500
         instance.yield_per_acre = 6
-        instance.bushels_eaten = 70
+        instance.rat_lossage = 70
         instance.grain_holdings = 1000
         for key, val in kwargs.items():
             setattr(instance, key, val)
