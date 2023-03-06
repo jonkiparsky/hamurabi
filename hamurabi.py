@@ -41,15 +41,15 @@ def query_bushels_to_feed(grain_holdings):
             not_enough_bushels(grain_holdings)
     return bushels_allocated_to_populace
 
-def query_acres_to_buy(yield_per_acre, grain_holdings):
-    print("LAND IS TRADING AT "+str(yield_per_acre)+" BUSHELS PER ACRE.")
+def query_acres_to_buy(cost_per_acre, grain_holdings):
+    print("LAND IS TRADING AT "+str(cost_per_acre)+" BUSHELS PER ACRE.")
     while True:
         print("HOW MANY ACRES DO YOU WISH TO BUY")
         acres_to_buy = int(input())
         if acres_to_buy < 0:
             no_can_do()
             so_long()
-        if yield_per_acre * acres_to_buy < grain_holdings:
+        if cost_per_acre * acres_to_buy < grain_holdings:
             break
     return acres_to_buy
 
@@ -214,71 +214,85 @@ def compute_harvest(acres_to_sow, grain_holdings):
     grain_holdings = grain_holdings - bushels_eaten + harvest
     return harvest, bushels_eaten, grain_holdings, yield_per_acre
 
-def main():
-    print_intro()
-    cumulative_deaths = 0
-    avg_deaths_per_year = 0
-    current_year = 0
-    population = 95
-    grain_holdings = 2800
-    harvest = 3000
-    rat_lossage = harvest - grain_holdings
-    yield_per_acre=3
-    acres_owned = harvest/yield_per_acre
-    immigration = 5
-    plague_quotient = 1
-    deaths_this_turn = 0
-    while True:
-        current_year, population = print_status_report(current_year,
-                                                       deaths_this_turn,
-                                                       immigration,
-                                                       population,
-                                                       plague_quotient,
-                                                       acres_owned, yield_per_acre,
-                                                       rat_lossage,
-                                                       grain_holdings)
-        if current_year==11:
-            break
-        C=int(10*random());yield_per_acre=C+17
-        acres_to_buy = query_acres_to_buy(yield_per_acre, grain_holdings)
-        if acres_to_buy != 0:
-            acres_owned = acres_owned + acres_to_buy
-            grain_holdings = grain_holdings - yield_per_acre * acres_to_buy
-            C=0
-        else:
-            acres_to_sell = query_acres_to_sell(acres_owned)
-            acres_owned = acres_owned - acres_to_sell
-            grain_holdings = grain_holdings + yield_per_acre * acres_to_sell
-            C=0
-        print()
 
-        bushels_to_feed = query_bushels_to_feed(grain_holdings)
-        grain_holdings = grain_holdings - bushels_to_feed
-        C=1;print()
-        deaths_this_turn, grain_holdings = query_acres_to_sow(acres_owned,
-                                                          grain_holdings,
-                                                          population)
+class Hamurabi:
 
-        harvest, rat_lossage, grain_holdings, yield_per_acre = compute_harvest(deaths_this_turn,
-                                                                               grain_holdings)
-        (immigration,
-         plague_quotient,
-         population,
-         avg_deaths_per_year,
-         deaths_this_turn,
-         cumulative_deaths) = compute_new_population(acres_owned,
-                                                     grain_holdings,
-                                                     population,
-                                                     avg_deaths_per_year,
-                                                     deaths_this_turn,
-                                                     cumulative_deaths,
-                                                     current_year,
-                                                     bushels_to_feed)
+    def __init__(self):
+        self.cumulative_deaths = 0
+        self.avg_deaths_per_year = 0
+        self.current_year = 0
+        self.population = 95
+        self.grain_holdings = 2800
+        self.harvest = 3000
+        self.rat_lossage = self.harvest - self.grain_holdings
+        self.yield_per_acre = 3
+        self.acres_owned = self.harvest / self.yield_per_acre
+        self.immigration = 5
+        self.plague_quotient = 1
+        self.deaths_this_turn = 0
 
-    print_end_result(avg_deaths_per_year,
-                     cumulative_deaths,
-                     acres_owned,
-                     population,
-                     deaths_this_turn)
+    def play(self):
+
+        print_intro()
+
+        while True:
+            self.current_year, self.population = print_status_report(self.current_year,
+                                                                     self.deaths_this_turn,
+                                                                     self.immigration,
+                                                                     self.population,
+                                                                     self.plague_quotient,
+                                                                     self.acres_owned, self.yield_per_acre,
+                                                                     self.rat_lossage,
+                                                                     self.grain_holdings)
+            if self.current_year==11:
+                break
+            C=int(10*random())
+            cost_per_acre = C+17
+            acres_to_buy = query_acres_to_buy(cost_per_acre, self.grain_holdings)
+            if acres_to_buy != 0:
+                self.acres_owned = self.acres_owned + acres_to_buy
+                self.grain_holdings = self.grain_holdings - cost_per_acre * acres_to_buy
+                C=0
+            else:
+                acres_to_sell = query_acres_to_sell(self.acres_owned)
+                self.acres_owned = self.acres_owned - acres_to_sell
+                self.grain_holdings = self.grain_holdings + cost_per_acre * acres_to_sell
+                C=0
+            print()
+
+            bushels_to_feed = query_bushels_to_feed(self.grain_holdings)
+            self.grain_holdings = self.grain_holdings - bushels_to_feed
+            C=1;print()
+            (self.deaths_this_turn,
+             self.grain_holdings) = query_acres_to_sow(self.acres_owned,
+                                                       self.grain_holdings,
+                                                       self.population)
+
+            (self.harvest,
+             self.rat_lossage,
+             self.grain_holdings,
+             self.yield_per_acre) = compute_harvest(self.deaths_this_turn,
+                                                    self.grain_holdings)
+            (self.immigration,
+             self.plague_quotient,
+             self.population,
+             self.avg_deaths_per_year,
+             self.deaths_this_turn,
+             self.cumulative_deaths) = compute_new_population(self.acres_owned,
+                                                              self.grain_holdings,
+                                                              self.population,
+                                                              self.avg_deaths_per_year,
+                                                              self.deaths_this_turn,
+                                                              self.cumulative_deaths,
+                                                              self.current_year,
+                                                              bushels_to_feed)
+
+        print_end_result(self.avg_deaths_per_year,
+                         self.cumulative_deaths,
+                         self.acres_owned,
+                         self.population,
+                         self.deaths_this_turn)
+
 if __name__== "__main__":
-    main()
+    game = Hamurabi()
+    game.play()
