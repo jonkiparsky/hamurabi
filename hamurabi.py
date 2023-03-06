@@ -102,32 +102,6 @@ def query_acres_to_sow(acres_owned, grain_holdings, population):
 
 
 
-def print_status_report(current_year,
-                        deaths_this_turn,
-                        immigration,
-                        population,
-                        plague_quotient,
-                        acres_owned,
-                        yield_per_acre,
-                        bushels_eaten,
-                        grain_holdings):
-    print("\n\n")
-    print("HAMMURABI I BEG TO REPORT TO YOU,")
-    current_year = current_year + 1
-    print("IN YEAR "+str(current_year) +
-          ", " + str(deaths_this_turn) + " PEOPLE STARVED,"
-          + str(immigration) +" CAME TO THE CITY,")
-    population=population+immigration
-    if plague_quotient <= 0:
-        population=int(population / 2)
-        print("A HORRIBLE PLAGUE STRUCK! HALF THE PEOPLE DIED")
-
-    print("THE POPULATION IS NOW "+str(population))
-    print("THE CITY NOW OWNS "+str(acres_owned)+" ACRES.")
-    print("YOU HARVESTED "+str(yield_per_acre)+" BUSHELS PER ACRE.")
-    print("RATS ATE "+str(bushels_eaten)+" BUSHELS.")
-    print("YOU NOW HAVE "+str(grain_holdings)+" BUSHELS IN STORE.");print()
-    return current_year, population
 
 
 def compute_new_population(acres_owned,
@@ -232,19 +206,30 @@ class Hamurabi:
         print("FOR A TEN YEAR TERM OF OFFICE")
         print()
 
+    def print_status_report(self):
+        print("\n\n")
+        print("HAMMURABI I BEG TO REPORT TO YOU,")
+        self.current_year = self.current_year + 1
+        print("IN YEAR "+str(self.current_year) +
+              ", " + str(self.deaths_this_turn) + " PEOPLE STARVED,"
+              + str(self.immigration) +" CAME TO THE CITY,")
+        self.population = self.population + self.immigration
+        if self.plague_quotient <= 0:
+            self.population = int(self.population / 2)
+            print("A HORRIBLE PLAGUE STRUCK! HALF THE PEOPLE DIED")
+
+        print("THE POPULATION IS NOW "+str(self.population))
+        print("THE CITY NOW OWNS "+str(self.acres_owned)+" ACRES.")
+        print("YOU HARVESTED "+str(self.yield_per_acre)+" BUSHELS PER ACRE.")
+        print("RATS ATE "+str(self.rat_lossage)+" BUSHELS.")
+        print("YOU NOW HAVE "+str(self.grain_holdings)+" BUSHELS IN STORE.");print()
+
     def play(self):
 
         self.print_intro()
 
         while True:
-            self.current_year, self.population = print_status_report(self.current_year,
-                                                                     self.deaths_this_turn,
-                                                                     self.immigration,
-                                                                     self.population,
-                                                                     self.plague_quotient,
-                                                                     self.acres_owned, self.yield_per_acre,
-                                                                     self.rat_lossage,
-                                                                     self.grain_holdings)
+            self.print_status_report()
             if self.current_year==11:
                 break
             C=int(10*random())
