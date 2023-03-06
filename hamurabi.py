@@ -27,48 +27,6 @@ def national_fink(deaths_this_turn):
     print("BEEN DECLARED NATIONAL FINK!!!")
     so_long()
 
-def query_bushels_to_feed(grain_holdings):
-
-    while True:
-        print("HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE")
-        bushels_allocated_to_populace = int(input())
-        if bushels_allocated_to_populace <= 0:
-            no_can_do()
-            so_long()
-        if bushels_allocated_to_populace<grain_holdings:
-            break
-        else:
-            not_enough_bushels(grain_holdings)
-    return bushels_allocated_to_populace
-
-def query_acres_to_buy(yield_per_acre, grain_holdings):
-    print("LAND IS TRADING AT "+str(yield_per_acre)+" BUSHELS PER ACRE.")
-    while True:
-        print("HOW MANY ACRES DO YOU WISH TO BUY")
-        acres_to_buy = int(input())
-        if acres_to_buy < 0:
-            no_can_do()
-            so_long()
-        if yield_per_acre * acres_to_buy < grain_holdings:
-            break
-    return acres_to_buy
-
-def query_acres_to_sell(acres_owned):
-    # Y: price of land in bushels per acre
-    # A: land owned in acres
-    # returns Q = number of acres to sell
-    while True:
-        print("HOW MANY ACRES DO YOU WISH TO SELL")
-        acres_to_sell = int(input())
-        if acres_to_sell < 0:
-            no_can_do()
-            so_long()
-        if acres_to_sell >= acres_owned:
-            not_enough_acres(acres_owned)
-        else:
-            break
-    return acres_to_sell
-
 def query_acres_to_sow(acres_owned, grain_holdings, population):
     # A: land owned in acres
     # S: grain holdings in bushels
@@ -224,6 +182,48 @@ class Hamurabi:
         print("RATS ATE "+str(self.rat_lossage)+" BUSHELS.")
         print("YOU NOW HAVE "+str(self.grain_holdings)+" BUSHELS IN STORE.");print()
 
+    def query_acres_to_buy(self):
+        print("LAND IS TRADING AT "+str(self.yield_per_acre)+" BUSHELS PER ACRE.")
+        while True:
+            print("HOW MANY ACRES DO YOU WISH TO BUY")
+            acres_to_buy = int(input())
+            if acres_to_buy < 0:
+                no_can_do()
+                so_long()
+            if self.yield_per_acre * acres_to_buy < self.grain_holdings:
+                break
+        return acres_to_buy
+
+    def query_acres_to_sell(self):
+        # Y: price of land in bushels per acre
+        # A: land owned in acres
+        # returns Q = number of acres to sell
+        while True:
+            print("HOW MANY ACRES DO YOU WISH TO SELL")
+            acres_to_sell = int(input())
+            if acres_to_sell < 0:
+                no_can_do()
+                so_long()
+            if acres_to_sell >= self.acres_owned:
+                not_enough_acres(self.acres_owned)
+            else:
+                break
+        return acres_to_sell
+
+    def query_bushels_to_feed(self):
+
+        while True:
+            print("HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE")
+            bushels_allocated_to_populace = int(input())
+            if bushels_allocated_to_populace <= 0:
+                no_can_do()
+                so_long()
+            if bushels_allocated_to_populace < self.grain_holdings:
+                break
+            else:
+                not_enough_bushels(self.grain_holdings)
+        return bushels_allocated_to_populace
+
     def play(self):
 
         self.print_intro()
@@ -234,19 +234,19 @@ class Hamurabi:
                 break
             C=int(10*random())
             self.yield_per_acre = C+17
-            acres_to_buy = query_acres_to_buy(self.yield_per_acre, self.grain_holdings)
+            acres_to_buy = self.query_acres_to_buy()
             if acres_to_buy != 0:
                 self.acres_owned = self.acres_owned + acres_to_buy
                 self.grain_holdings = self.grain_holdings - self.yield_per_acre * acres_to_buy
                 C=0
             else:
-                acres_to_sell = query_acres_to_sell(self.acres_owned)
+                acres_to_sell = self.query_acres_to_sell()
                 self.acres_owned = self.acres_owned - acres_to_sell
                 self.grain_holdings = self.grain_holdings + self.yield_per_acre * acres_to_sell
                 C=0
             print()
 
-            bushels_to_feed = query_bushels_to_feed(self.grain_holdings)
+            bushels_to_feed = self.query_bushels_to_feed()
             self.grain_holdings = self.grain_holdings - bushels_to_feed
             C=1;print()
             (self.deaths_this_turn,
