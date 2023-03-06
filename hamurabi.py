@@ -100,13 +100,6 @@ def query_acres_to_sow(acres_owned, grain_holdings, population):
         break
     return acres_to_sow, grain_holdings
 
-def print_intro():
-    print("HAMMURABI".rjust(32))
-    print("CREATIVE COMPUTING MORRISTOWN NEW JERSEY".rjust(15))
-    print("\n"*2)
-    print("TRY YOUR HAND AT GOVERNING ANCIENT SUMERIA")
-    print("FOR A TEN YEAR TERM OF OFFICE")
-    print()
 
 
 def print_status_report(current_year,
@@ -231,9 +224,17 @@ class Hamurabi:
         self.plague_quotient = 1
         self.deaths_this_turn = 0
 
+    def print_intro(self):
+        print("HAMMURABI".rjust(32))
+        print("CREATIVE COMPUTING MORRISTOWN NEW JERSEY".rjust(15))
+        print("\n"*2)
+        print("TRY YOUR HAND AT GOVERNING ANCIENT SUMERIA")
+        print("FOR A TEN YEAR TERM OF OFFICE")
+        print()
+
     def play(self):
 
-        print_intro()
+        self.print_intro()
 
         while True:
             self.current_year, self.population = print_status_report(self.current_year,
