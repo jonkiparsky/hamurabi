@@ -8,10 +8,7 @@ from hamurabi import (
     not_enough_acres,
     not_enough_bushels,
     print_end_result,
-    query_acres_to_buy,
-    query_acres_to_sell,
     query_acres_to_sow,
-    query_bushels_to_feed,
     so_long,
 )
 from pytest import (
@@ -60,14 +57,16 @@ def test_print_intro(capsys):
 
 class TestQueryBushelsToFeed():
     def test_can_feed_less_than_current_holdings(self):
+        instance = Hamurabi()
         hamurabi.input = lambda: 5
-        Q = query_bushels_to_feed(10)
-        assert Q == 5
+        bushels_to_feed = instance.query_bushels_to_feed()
+        assert bushels_to_feed == 5
 
     def test_exit_on_negative_input(self):
+        instance = Hamurabi()
         with raises(SystemExit):
             hamurabi.input = lambda: -5
-            query_bushels_to_feed(10)
+            instance.query_bushels_to_feed()
 
     def test_cannot_feed_more_than_current_holdings(self):
         # oops! trying to test this will get us into a loop!
@@ -75,14 +74,17 @@ class TestQueryBushelsToFeed():
 
 class TestQueryAcresToBuy():
     def test_can_spend_less_than_current_grain_holdings(self):
+        instance = Hamurabi()
+        instance.grain_holdings = 101
         hamurabi.input = lambda: 5
-        acres_to_buy = query_acres_to_buy(1, 10)
+        acres_to_buy = instance.query_acres_to_buy(20)
         assert acres_to_buy == 5
 
     def test_cannot_buy_negative_acres(self):
+        instance = Hamurabi()
         with raises(SystemExit):
             hamurabi.input = lambda: -5
-            acres_to_buy = query_acres_to_buy(1, 10)
+            acres_to_buy = instance.query_acres_to_buy(20)
 
     def test_cannot_spend_more_than_current_grain_holdings(self):
         # cannot test this now, due to loop
@@ -91,14 +93,16 @@ class TestQueryAcresToBuy():
 
 class TestQueryAcresToSell():
     def test_can_sell_less_than_current_land_holdings(self):
+        instance = Hamurabi()
         hamurabi.input = lambda: 5
-        acres_to_sell = query_acres_to_sell(10)
+        acres_to_sell = instance.query_acres_to_sell()
         assert acres_to_sell == 5
 
     def test_cannot_sell_negative_acres(self):
+        instance = Hamurabi()
         with raises(SystemExit):
             hamurabi.input = lambda: -5
-            acres_to_sell = query_acres_to_sell(10)
+            acres_to_sell = instance.query_acres_to_sell()
 
     def test_cannot_sell_more_than_current_land_holdings(self):
         # cannot test this now, due to loop
@@ -106,6 +110,7 @@ class TestQueryAcresToSell():
 
 class TestQueryAcresToSow():
     def test_can_sow_less_than_current_land_holdings(self):
+
         hamurabi.input = lambda: 5
         acres_to_sow, grain_holdings = query_acres_to_sow(10, 100, 100)
         assert acres_to_sow == 5
