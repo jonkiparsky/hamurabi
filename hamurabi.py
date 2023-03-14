@@ -63,35 +63,51 @@ def compute_plague_quotient():
     return int( 10 * (2 * random() -.3 ))
 
 
+TERM_SUMMARY_INTRO = "\n".join([
+    "IN YOUR TEN-YEAR TERM OF OFFICE, {death_rate} PERCENT OF THE",
+    "POPULATION STARVED PER YEAR ON AVERAGE, I.E. A TOTAL OF",
+    "{cumulative_deaths} PEOPLE DIED!!",
+    "YOU STARTED WITH 10 ACRES PER PERSON AND ENDED WITH",
+    "{acres_per_person} ACRES PER PERSON."])
+
+TERM_EVALUATION_LOUSY = "\n".join([
+        "YOUR HEAVY-HANDED PERFORMANCE SMACKS OF NERO AND IVAN IV",
+        "THE PEOPLE (REMAINING) FIND YOU AN UNPLEASANT RULER AND",
+        "FRANKLY, HATE YOUR GUTS!"])
+
+TERM_EVALUATION_MEDIOCRE = "\n".join([
+        "YOUR PERFORMANCE COULD HAVE BEEN SOMEWHAT BETTER, BUT",
+        "REALLY, WASN'T TOO BAD AT ALL. {} PEOPLE",
+        "DEARLY LIKE TO SEE YOU ASSASSINATED, BUT WE ALL HAVE OUR",
+        "TRIVIAL PROBLEMS."])
+
+TERM_EVALUATION_GREAT = "\n".join([
+    "A FANTASTIC PERFORMANCE!!! CHARLEMAGNE, DISRAELI AND",
+    "JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!"])
+
 def print_end_result(avg_death_rate_per_year, cumulative_deaths,
                      acres_owned, population, deaths_this_turn):
-
-    print( "IN YOUR TEN-YEAR TERM OF OFFICE, " +str(avg_death_rate_per_year)+ " PERCENT OF THE")
-    print( "POPULATION STARVED PER YEAR ON AVERAGE, I.E. A TOTAL OF")
-    print( str(cumulative_deaths)+" PEOPLE DIED!!")
     acres_per_person = acres_owned / population
-    print( "YOU STARTED WITH 10 ACRES PER PERSON AND ENDED WITH")
-    print( str(acres_per_person)+" ACRES PER PERSON.")
+    print(TERM_SUMMARY_INTRO.format(death_rate=avg_death_rate_per_year,
+                                    cumulative_deaths=cumulative_deaths,
+                                    acres_per_person=acres_per_person))
+
     print()
+
     if avg_death_rate_per_year > 33:
         national_fink(deaths_this_turn)
     if acres_per_person < 7:
         national_fink(deaths_this_turn)
     if avg_death_rate_per_year > 10:
-        print( "YOUR HEAVY-HANDED PERFORMANCE SMACKS OF NERO AND IVAN IV")
-        print( "THE PEOPLE (REMAINING) FIND YOU AN UNPLEASANT RULER AND")
-        print( "FRANKLY, HATE YOUR GUTS!")
+        print(TERM_EVALUATION_LOUSY)
         so_long()
 
     if avg_death_rate_per_year > 3 or acres_per_person < 10:
-        print( "YOUR PERFORMANCE COULD HAVE BEEN SOMEWHAT BETTER, BUT")
-        print( "REALLY, WASN'T TOO BAD AT ALL. "+ str(int(population * .8 * random()))+" PEOPLE")
-        print( "DEARLY LIKE TO SEE YOU ASSASSINATED, BUT WE ALL HAVE OUR")
-        print( "TRIVIAL PROBLEMS.")
+        haters = str(int(population * .8 * random()))
+        print(TERM_EVALUATION_MEDIOCRE.format(haters))
         so_long()
 
-    print( "A FANTASTIC PERFORMANCE!!! CHARLEMAGNE, DISRAELI AND")
-    print( "JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!")
+    print(TERM_EVALUATION_GREAT)
     so_long()
 
 def compute_population_fed(bushels_to_feed):
