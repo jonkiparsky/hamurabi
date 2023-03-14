@@ -85,30 +85,6 @@ TERM_EVALUATION_GREAT = "\n".join([
     "A FANTASTIC PERFORMANCE!!! CHARLEMAGNE, DISRAELI AND",
     "JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!"])
 
-def print_end_result(avg_death_rate_per_year, cumulative_deaths,
-                     acres_owned, population, deaths_this_turn):
-    acres_per_person = acres_owned / population
-    print(TERM_SUMMARY_INTRO.format(death_rate=avg_death_rate_per_year,
-                                    cumulative_deaths=cumulative_deaths,
-                                    acres_per_person=acres_per_person))
-
-    print()
-
-    if avg_death_rate_per_year > 33:
-        national_fink(deaths_this_turn)
-    if acres_per_person < 7:
-        national_fink(deaths_this_turn)
-    if avg_death_rate_per_year > 10:
-        print(TERM_EVALUATION_LOUSY)
-        so_long()
-
-    if avg_death_rate_per_year > 3 or acres_per_person < 10:
-        haters = str(int(population * .8 * random()))
-        print(TERM_EVALUATION_MEDIOCRE.format(haters))
-        so_long()
-
-    print(TERM_EVALUATION_GREAT)
-    so_long()
 
 def compute_population_fed(bushels_to_feed):
     return int(bushels_to_feed / 20)
@@ -237,6 +213,30 @@ class Hamurabi:
         else:
             national_fink(self.deaths_this_turn)
 
+    def print_end_result(self):
+        acres_per_person = self.acres_owned / self.population
+        print(TERM_SUMMARY_INTRO.format(death_rate=self.avg_death_rate_per_year,
+                                        cumulative_deaths=self.cumulative_deaths,
+                                        acres_per_person=acres_per_person))
+
+        print()
+
+        if self.avg_death_rate_per_year > 33:
+            national_fink(self.deaths_this_turn)
+        if acres_per_person < 7:
+            national_fink(self.deaths_this_turn)
+        if self.avg_death_rate_per_year > 10:
+            print(TERM_EVALUATION_LOUSY)
+            so_long()
+
+        if self.avg_death_rate_per_year > 3 or acres_per_person < 10:
+            haters = str(int(self.population * .8 * random()))
+            print(TERM_EVALUATION_MEDIOCRE.format(haters))
+            so_long()
+
+        print(TERM_EVALUATION_GREAT)
+        so_long()
+
     def play(self):
 
         self.print_intro()
@@ -269,11 +269,7 @@ class Hamurabi:
             self.compute_harvest()
             self.compute_new_population(bushels_to_feed)
 
-        print_end_result(self.avg_death_rate_per_year,
-                         self.cumulative_deaths,
-                         self.acres_owned,
-                         self.population,
-                         self.deaths_this_turn)
+        self.print_end_result()
 
 if __name__== "__main__":
     game = Hamurabi()

@@ -5,7 +5,6 @@ from hamurabi import (
     no_can_do,
     not_enough_acres,
     not_enough_bushels,
-    print_end_result,
     query_acres_to_sow,
     so_long,
     TERM_SUMMARY_INTRO,
@@ -48,76 +47,42 @@ def test_national_fink(capsys):
 
 class TestPrintEndResult:
     def test_print_end_result_intro(capsys):
-        death_rate = 0
-        cumulative_deaths = 0
-        acres_owned = 1000
-        population = 100
-        deaths_this_turn = 0
-        acres_per_person = acres_owned/population
+        instance = Hamurabi()
+        acres_per_person = instance.acres_owned/instance.population
 
         with raises(SystemExit):
-            print_end_result(death_rate,
-                             cumulative_deaths,
-                             acres_owned,
-                             population,
-                             deaths_this_turn)
+            instance.print_end_result()
             assert_in_stdout(TERM_SUMMARY_INTRO.format(
-                death_rate=death_rate,
-                cumulative_deaths=cumulative_deaths,
+                death_rate=instance.avg_death_rate_per_year,
+                cumulative_deaths=instance.cumulative_deaths,
                 acres_per_person=acres_per_person))
 
     def test_print_end_result_summary_lousy(capsys):
-        death_rate = 11
-        cumulative_deaths = 0
-        acres_owned = 1000
-        population = 100
-        deaths_this_turn = 0
-        acres_per_person = acres_owned/population
+        instance = Hamurabi()
+        instance.avg_death_rate_per_year = 11
+        acres_per_person = instance.acres_owned/instance.population
 
         with raises(SystemExit):
-            print_end_result(death_rate,
-                             cumulative_deaths,
-                             acres_owned,
-                             population,
-                             deaths_this_turn)
+            instance.print_end_result()
             assert_in_stdout(TERM_EVALUATION_LOUSY)
 
     def test_print_end_result_mediocre(capsys):
-        death_rate = 5
-        cumulative_deaths = 0
-        acres_owned = 1000
-        population = 100
-        deaths_this_turn = 0
-        acres_per_person = acres_owned/population
+        instance = Hamurabi()
+        instance.avg_death_rate_per_year = 5
+        acres_per_person = instance.acres_owned/instance.population
         random_number = .5
-        haters = population * .8 * random_number
+        haters = instance.population * .8 * random_number
         hamurabi.random = lambda: random_number
 
         with raises(SystemExit):
-            print_end_result(death_rate,
-                             cumulative_deaths,
-                             acres_owned,
-                             population,
-                             deaths_this_turn)
+            instance.print_end_result()
             assert_in_stdout(TERM_EVALUATION_MEDIOCRE.format(haters))
 
     def test_print_end_result_great(capsys):
-        death_rate = 0
-        cumulative_deaths = 0
-        acres_owned = 1000
-        population = 100
-        deaths_this_turn = 0
-        acres_per_person = acres_owned/population
-        random_number = .5
-        haters = population * .8 * random_number
-        hamurabi.random = lambda: random_number
-
+        instance = Hamurabi()
+        acres_per_person = instance.acres_owned/instance.population
         with raises(SystemExit):
-            print_end_result(death_rate,
-                             cumulative_deaths,
-                             acres_owned,
-                             population,
-                             deaths_this_turn)
+            instance.print_end_result()
             assert_in_stdout(TERM_EVALUATION_GREAT)
 
 def test_print_intro(capsys):
