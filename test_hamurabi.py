@@ -1,7 +1,5 @@
 import hamurabi
 from hamurabi import (
-    compute_harvest,
-    compute_new_population,
     Hamurabi,
     national_fink,
     no_can_do,
@@ -216,62 +214,97 @@ class TestPrintStatusReport():
 
 class TestComputeHarvest:
     def test_harvest_no_rats(self):
-        hamurabi.random_value = lambda: 3
-        sown = 1000
-        stored = 100
-        harvest, bushels_eaten, grain_holdings, _ = compute_harvest(sown,
-                                                                    stored)
-        assert harvest == 3000
-        assert bushels_eaten == 0
-        assert grain_holdings == stored - bushels_eaten + harvest
+        instance = Hamurabi()
+        hamurabi.random_value = lambda: 3  # odd number means no rats
+        sown = instance.acres_to_sow = 1000
+        stored = instance.grain_holdings = 100
+        instance.compute_harvest()
+        assert instance.harvest == 3000
+        assert instance.rat_lossage == 0
+        assert instance.grain_holdings == stored - instance.rat_lossage + instance.harvest
 
     def test_harvest_with_rats(self):
+        instance = Hamurabi()
         hamurabi.random_value = lambda: 2  # even number means rats
-        sown = 1000
-        stored = 100
-        harvest, bushels_eaten, grain_holdings, _ = compute_harvest(sown, stored)
-        assert harvest == 2000
-        assert bushels_eaten == 50
-        assert grain_holdings == stored - bushels_eaten + harvest
+        sown = instance.acres_to_sow =1000
+        stored = instance.grain_holdings = 100
+        instance.compute_harvest()
+        assert instance.harvest == 2000
+        assert instance.rat_lossage == 50
+        assert instance.grain_holdings == stored - instance.rat_lossage + instance.harvest
 
 class TestComputeNewPopulation:
-    def arguments(self, arg_updates=None):
-        argnames = """acres_owned
-        grain_holdings
-        population
-        avg_deaths_per_year
-        deaths_this_turn
-        cumulative_deaths
-        current_year
-        bushels_to_feed""".split()
+    def game_instance(self, **kwargs):
+        instance = Hamurabi()
 
-        vals = [1000, 2000, 100, 4, 2, 4, 2, 2000]
-        args_dict = dict(zip(argnames, vals))
-        if arg_updates:
-            args_dict.update(arg_updates)
-        return args_dict
+        instance.current_year = 2
+        instance.deaths_this_turn = 2
+        instance.immigration = 10
+        instance.population = 100
+        instance.plague_quotient = 1
+        instance.acres_owned = 1000
+        instance.yield_per_acre = 6
+        instance.rat_lossage = 70
+        instance.grain_holdings = 2000
+        instance.avg_death_rate_per_year = 4
+        instance.cumulative_deaths = 4
+        for key, val in kwargs.items():
+            setattr(instance, key, val)
+        return instance
 
     def test_immigration(self):
+        instance = self.game_instance()
         hamurabi.random_value = lambda: 2
-        immigration = compute_new_population(**self.arguments())[0]
-        assert immigration == 5
+        instance.compute_new_population(2000)
+        assert instance.immigration == 5
 
     def test_plague(self):
+        instance = self.game_instance()
         hamurabi.random = lambda: 0.15
-        plague_quotient = compute_new_population(**self.arguments())[1]
-        assert plague_quotient == 0
+        instance.compute_new_population(2000)
+        assert instance.plague_quotient == 0
 
     def test_starve(self):
-        updated = {"bushels_to_feed": 1900}
-        (avg_deaths_per_year,
-         deaths_this_turn,
-         cumulative_deaths) = compute_new_population(
-            **self.arguments(updated))[3:]
-        assert deaths_this_turn == 5
-        assert cumulative_deaths == 9
-        assert avg_deaths_per_year == 4.5
+        instance = self.game_instance()
+        instance.compute_new_population(1900)
+        assert instance.deaths_this_turn == 5
+        assert instance.cumulative_deaths == 9
+        assert instance.avg_death_rate_per_year == 4.5
 
     def test_starve_with_impeachment(self):
-        updated = {"bushels_to_feed": 700}
+        instance = self.game_instance()
         with raises(SystemExit):
-            compute_new_population(**self.arguments(updated))
+            instance.compute_new_population(700)
+
+
+class TestImpeach:
+    def test_should_impeach(self):
+        instance = Hamurabi()
+        instance.deaths_this_turn = 451
+        instance.population = 1000
+        assert instance.impeach() is True
+
+    def test_should_impeach(self):
+        instance = Hamurabi()
+        instance.deaths_this_turn = 449
+        instance.population = 1000
+        assert instance.impeach() is False
+
+
+class TestAverageDeathRatePerYear:
+    def test_average(self):
+        instance = Hamurabi()
+        instance.current_year = 5
+        instance.avg_death_rate_per_year = 0.25
+
+        instance.deaths_this_turn = 5
+        instance.population = 1000
+        assert instance.average_death_rate_per_year() == 0.3
+
+
+class TestImmigration:
+    def test_immigration(self):
+        instance = Hamurabi()
+        hamurabi.random_value = lambda: 2
+        instance.compute_immigration()
+        assert instance.immigration == 5

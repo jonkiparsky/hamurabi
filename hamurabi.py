@@ -58,62 +58,32 @@ def query_acres_to_sow(acres_owned, grain_holdings, population):
         break
     return acres_to_sow, grain_holdings
 
-def compute_new_population(acres_owned,
-                           grain_holdings,
-                           population,
-                           avg_deaths_per_year,
-                           deaths_this_turn,
-                           cumulative_deaths,
-                           current_year,
-                           bushels_to_feed):
 
-    # ***LETS HAVE SOME BABIES  ### actually, this is immigration...
-    immigration = int(random_value() * (20 * acres_owned + grain_holdings) / population / 100 + 1)
-    # ***HOW MANY PEOPLE HAD FULL BELLIES?
-    population_fed = int(bushels_to_feed / 20)
-    # ***HORROR, 15% CHANCE OF PLAGUE
-    plague_quotient = int( 10 * (2 * random() -.3 ))
-    if population < population_fed:
-        return (immigration, plague_quotient, population,
-                avg_deaths_per_year, deaths_this_turn, cumulative_deaths)
-    # ***STARVE ENOUGH FOR IMPEACHMENT?
-    deaths_this_turn = population - population_fed
-    if deaths_this_turn <= .45 * population:
-        avg_deaths_per_year=((current_year - 1) * avg_deaths_per_year +
-                             deaths_this_turn * 100 / population) / current_year
-        population = population_fed
-        cumulative_deaths = cumulative_deaths + deaths_this_turn
-    else:
-        national_fink(deaths_this_turn)
-    return (immigration,
-            plague_quotient,
-            population,
-            avg_deaths_per_year,
-            deaths_this_turn,
-            cumulative_deaths)
+def compute_plague_quotient():
+    return int( 10 * (2 * random() -.3 ))
 
 
-def print_end_result(avg_deaths_per_year, cumulative_deaths,
+def print_end_result(avg_death_rate_per_year, cumulative_deaths,
                      acres_owned, population, deaths_this_turn):
 
-    print( "IN YOUR TEN-YEAR TERM OF OFFICE, " +str(avg_deaths_per_year)+ " PERCENT OF THE")
+    print( "IN YOUR TEN-YEAR TERM OF OFFICE, " +str(avg_death_rate_per_year)+ " PERCENT OF THE")
     print( "POPULATION STARVED PER YEAR ON AVERAGE, I.E. A TOTAL OF")
     print( str(cumulative_deaths)+" PEOPLE DIED!!")
     acres_per_person = acres_owned / population
     print( "YOU STARTED WITH 10 ACRES PER PERSON AND ENDED WITH")
     print( str(acres_per_person)+" ACRES PER PERSON.")
     print()
-    if avg_deaths_per_year > 33:
+    if avg_death_rate_per_year > 33:
         national_fink(deaths_this_turn)
     if acres_per_person < 7:
         national_fink(deaths_this_turn)
-    if avg_deaths_per_year > 10:
+    if avg_death_rate_per_year > 10:
         print( "YOUR HEAVY-HANDED PERFORMANCE SMACKS OF NERO AND IVAN IV")
         print( "THE PEOPLE (REMAINING) FIND YOU AN UNPLEASANT RULER AND")
         print( "FRANKLY, HATE YOUR GUTS!")
         so_long()
 
-    if avg_deaths_per_year > 3 or acres_per_person < 10:
+    if avg_death_rate_per_year > 3 or acres_per_person < 10:
         print( "YOUR PERFORMANCE COULD HAVE BEEN SOMEWHAT BETTER, BUT")
         print( "REALLY, WASN'T TOO BAD AT ALL. "+ str(int(population * .8 * random()))+" PEOPLE")
         print( "DEARLY LIKE TO SEE YOU ASSASSINATED, BUT WE ALL HAVE OUR")
@@ -124,23 +94,15 @@ def print_end_result(avg_deaths_per_year, cumulative_deaths,
     print( "JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!")
     so_long()
 
-def compute_harvest(acres_to_sow, grain_holdings):
-    yield_per_acre = random_value()
-    harvest = acres_to_sow * yield_per_acre
-    bushels_eaten = 0
-    C = random_value()
-    if int(C/2) == C/2:
-        # *** THE RATS ARE RUNNING WILD!
-        bushels_eaten = int(grain_holdings / C)
-    grain_holdings = grain_holdings - bushels_eaten + harvest
-    return harvest, bushels_eaten, grain_holdings, yield_per_acre
+def compute_population_fed(bushels_to_feed):
+    return int(bushels_to_feed / 20)
 
 
 class Hamurabi:
 
     def __init__(self):
         self.cumulative_deaths = 0
-        self.avg_deaths_per_year = 0
+        self.avg_death_rate_per_year = 0
         self.current_year = 0
         self.population = 95
         self.grain_holdings = 2800
@@ -220,6 +182,45 @@ class Hamurabi:
                 not_enough_bushels(self.grain_holdings)
         return bushels_allocated_to_populace
 
+    def compute_harvest(self):
+        self.yield_per_acre = random_value()
+        self.harvest = self.acres_to_sow * self.yield_per_acre
+        self.rat_lossage = 0
+        C = random_value()
+        if int(C/2) == C/2:
+            # *** THE RATS ARE RUNNING WILD!
+            self.rat_lossage = int(self.grain_holdings / C)
+        self.grain_holdings = self.grain_holdings - self.rat_lossage + self.harvest
+
+
+    def compute_immigration(self):
+        self.immigration = int(random_value() *
+                               (20 * self.acres_owned + self.grain_holdings) /
+                               self.population / 100 + 1)
+
+
+    def impeach(self):
+        return self.deaths_this_turn > .45 * self.population
+
+    def average_death_rate_per_year(self):
+        return ((self.current_year - 1) * self.avg_death_rate_per_year +
+                self.deaths_this_turn * 100 / self.population) / self.current_year
+
+    def compute_new_population(self, bushels_to_feed):
+        self.compute_immigration()
+        population_fed = compute_population_fed(bushels_to_feed)
+        self.plague_quotient = compute_plague_quotient()
+        if self.population < population_fed:
+            return (self.immigration, self.plague_quotient, self.population,
+                    self.avg_death_rate_per_year, self.deaths_this_turn, self.cumulative_deaths)
+        self.deaths_this_turn = self.population - population_fed
+        if not self.impeach():
+            self.avg_death_rate_per_year = self.average_death_rate_per_year()
+            self.population = population_fed
+            self.cumulative_deaths = self.cumulative_deaths + self.deaths_this_turn
+        else:
+            national_fink(self.deaths_this_turn)
+
     def play(self):
 
         self.print_intro()
@@ -245,31 +246,14 @@ class Hamurabi:
             bushels_to_feed = self.query_bushels_to_feed()
             self.grain_holdings = self.grain_holdings - bushels_to_feed
             C=1;print()
-            (self.deaths_this_turn,
+            (self.acres_to_sow,
              self.grain_holdings) = query_acres_to_sow(self.acres_owned,
                                                        self.grain_holdings,
                                                        self.population)
+            self.compute_harvest()
+            self.compute_new_population(bushels_to_feed)
 
-            (self.harvest,
-             self.rat_lossage,
-             self.grain_holdings,
-             self.yield_per_acre) = compute_harvest(self.deaths_this_turn,
-                                                    self.grain_holdings)
-            (self.immigration,
-             self.plague_quotient,
-             self.population,
-             self.avg_deaths_per_year,
-             self.deaths_this_turn,
-             self.cumulative_deaths) = compute_new_population(self.acres_owned,
-                                                              self.grain_holdings,
-                                                              self.population,
-                                                              self.avg_deaths_per_year,
-                                                              self.deaths_this_turn,
-                                                              self.cumulative_deaths,
-                                                              self.current_year,
-                                                              bushels_to_feed)
-
-        print_end_result(self.avg_deaths_per_year,
+        print_end_result(self.avg_death_rate_per_year,
                          self.cumulative_deaths,
                          self.acres_owned,
                          self.population,
