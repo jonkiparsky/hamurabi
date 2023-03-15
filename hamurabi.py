@@ -9,15 +9,15 @@ def so_long():
     print()
     exit()
 
+def random_value():
+    return int(random()*5)+1
+
 def not_enough_acres(acres_owned):  # line 720
     print ("HAMMURABI: THINK AGAIN. YOU OWN ONLY "+ str(acres_owned)+ " ACRES. NOW THEN,")
 
 def not_enough_bushels(grain_holdings):
     print("HAMMURABI: THINK AGAIN. YOU HAVE ONLY")
     print(str(grain_holdings)+" BUSHELS OF GRAIN. NOW THEN, ")
-
-def random_value():
-    return int(random()*5)+1
 
 def national_fink(deaths_this_turn):
     print()
@@ -26,38 +26,6 @@ def national_fink(deaths_this_turn):
     print("BEEN IMPEACHED AND THROWN OUT OF OFFICE BUT YOU HAVE")
     print("BEEN DECLARED NATIONAL FINK!!!")
     so_long()
-
-def query_acres_to_sow(acres_owned, grain_holdings, population):
-    # A: land owned in acres
-    # S: grain holdings in bushels
-    # P: population in people
-    # returns D = number of acres to sow and S = modified grain holdings
-    while True:
-        print("HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED")
-        acres_to_sow = int(input())
-        if acres_to_sow == 0:
-            break
-        if acres_to_sow<0:
-            no_can_do()
-            so_long()
-        # ***TRYING TO PLANT MORE ACRES THAN YOU OWN?
-        if acres_to_sow>=acres_owned:
-            not_enough_acres(acres_owned)
-            continue
-
-        # ***ENOUGH GRAIN FOR SEED?
-        if int(acres_to_sow / 2) > grain_holdings:
-            not_enough_bushels(grain_holdings)
-            continue
-        # ***ENOUGH PEOPLE TO TEND THE CROPS?
-        if acres_to_sow >= 10 * population:
-
-            print("BUT YOU HAVE ONLY " + str(population) + " PEOPLE TO TEND THE FIELDS! NOW THEN, ")
-            continue
-        grain_holdings = grain_holdings - int(acres_to_sow / 2)
-        break
-    return acres_to_sow, grain_holdings
-
 
 def compute_plague_quotient():
     return int( 10 * (2 * random() -.3 ))
@@ -145,9 +113,6 @@ class Hamurabi:
         return acres_to_buy
 
     def query_acres_to_sell(self):
-        # Y: price of land in bushels per acre
-        # A: land owned in acres
-        # returns Q = number of acres to sell
         while True:
             print("HOW MANY ACRES DO YOU WISH TO SELL")
             acres_to_sell = int(input())
@@ -161,7 +126,6 @@ class Hamurabi:
         return acres_to_sell
 
     def query_bushels_to_feed(self):
-
         while True:
             print("HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE")
             bushels_allocated_to_populace = int(input())
@@ -174,6 +138,34 @@ class Hamurabi:
                 not_enough_bushels(self.grain_holdings)
         return bushels_allocated_to_populace
 
+
+    def query_acres_to_sow(self):
+        while True:
+            print("HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED")
+            self.acres_to_sow = int(input())
+            if self.acres_to_sow == 0:
+                break
+            if self.acres_to_sow<0:
+                no_can_do()
+                so_long()
+            # ***TRYING TO PLANT MORE ACRES THAN YOU OWN?
+            if self.acres_to_sow>=self.acres_owned:
+                not_enough_acres(self.acres_owned)
+                continue
+
+            # ***ENOUGH GRAIN FOR SEED?
+            if int(self.acres_to_sow / 2) > self.grain_holdings:
+                not_enough_bushels(self.grain_holdings)
+                continue
+            # ***ENOUGH PEOPLE TO TEND THE CROPS?
+            if self.acres_to_sow >= 10 * self.population:
+
+                print("BUT YOU HAVE ONLY " + str(self.population) + " PEOPLE TO TEND THE FIELDS! NOW THEN, ")
+                continue
+            self.grain_holdings = self.grain_holdings - int(self.acres_to_sow / 2)
+            break
+        return self.acres_to_sow, self.grain_holdings
+
     def compute_harvest(self):
         self.yield_per_acre = random_value()
         self.harvest = self.acres_to_sow * self.yield_per_acre
@@ -184,12 +176,10 @@ class Hamurabi:
             self.rat_lossage = int(self.grain_holdings / C)
         self.grain_holdings = self.grain_holdings - self.rat_lossage + self.harvest
 
-
     def compute_immigration(self):
         self.immigration = int(random_value() *
                                (20 * self.acres_owned + self.grain_holdings) /
                                self.population / 100 + 1)
-
 
     def impeach(self):
         return self.deaths_this_turn > .45 * self.population
@@ -262,10 +252,7 @@ class Hamurabi:
             bushels_to_feed = self.query_bushels_to_feed()
             self.grain_holdings = self.grain_holdings - bushels_to_feed
             C=1;print()
-            (self.acres_to_sow,
-             self.grain_holdings) = query_acres_to_sow(self.acres_owned,
-                                                       self.grain_holdings,
-                                                       self.population)
+            self.query_acres_to_sow()
             self.compute_harvest()
             self.compute_new_population(bushels_to_feed)
 

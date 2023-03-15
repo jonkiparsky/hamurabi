@@ -5,7 +5,6 @@ from hamurabi import (
     no_can_do,
     not_enough_acres,
     not_enough_bushels,
-    query_acres_to_sow,
     so_long,
     TERM_SUMMARY_INTRO,
     TERM_EVALUATION_LOUSY,
@@ -145,15 +144,18 @@ class TestQueryAcresToSell():
 
 class TestQueryAcresToSow():
     def test_can_sow_less_than_current_land_holdings(self):
-
+        instance = Hamurabi()
         hamurabi.input = lambda: 5
-        acres_to_sow, grain_holdings = query_acres_to_sow(10, 100, 100)
-        assert acres_to_sow == 5
+        instance.query_acres_to_sow()
+        assert instance.acres_to_sow == 5
 
     def test_sow_two_acres_per_bushel(self):
-        hamurabi.input = lambda: 6
-        acres_to_sow, grain_holdings = query_acres_to_sow(10, 3, 100)
-        assert grain_holdings == 0
+        instance = Hamurabi()
+        initial_grain = instance.grain_holdings
+        sown_acreage = 6
+        hamurabi.input = lambda: sown_acreage
+        instance.query_acres_to_sow()
+        assert instance.grain_holdings == initial_grain - sown_acreage/2
 
     def test_cannot_sow_without_enough_grain(self):
         # cannot test this now, loop
@@ -164,16 +166,19 @@ class TestQueryAcresToSow():
         pass
 
     def test_cannot_sow_negative_acreage(self):
+        instance = Hamurabi()
         with raises(SystemExit):
             hamurabi.input = lambda: -5
-            acres_to_sow, grain_holdings = query_acres_to_sow(10, 100, 100)
+            instance.query_acres_to_sow()
 
     def test_can_sow_zero_acres(self):
+        instance = Hamurabi()
         user_input = 0
-        initial_acreage = 100
+        initial_acreage = instance.acres_owned
         hamurabi.input = lambda: user_input
-        result = query_acres_to_sow(initial_acreage, 100, 100)
-        assert result == (user_input, initial_acreage)
+        instance.query_acres_to_sow()
+        assert instance.acres_owned == initial_acreage
+
 
 class TestPrintStatusReport():
     def game_instance(self, **kwargs):
