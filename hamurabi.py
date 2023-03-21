@@ -1,5 +1,6 @@
 from random import random
 
+TURN_COUNT = 10
 def no_can_do():
     print("HAMMURABI, I CANNOT DO WHAT YOU WISH.")
     print("GET YOURSELF ANOTHER STEWARD!!!")
@@ -138,7 +139,6 @@ class Hamurabi:
                 not_enough_bushels(self.grain_holdings)
         return bushels_allocated_to_populace
 
-
     def query_acres_to_sow(self):
         while True:
             print("HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED")
@@ -228,13 +228,9 @@ class Hamurabi:
         so_long()
 
     def play(self):
-
         self.print_intro()
-
-        while True:
+        while self.current_year < TURN_COUNT:
             self.print_status_report()
-            if self.current_year==11:
-                break
             C=int(10*random())
             cost_per_acre = C+17
             acres_to_buy = self.query_acres_to_buy(cost_per_acre)
@@ -256,6 +252,7 @@ class Hamurabi:
             self.compute_harvest()
             self.compute_new_population(bushels_to_feed)
 
+        self.print_status_report()
         self.print_end_result()
 
 if __name__== "__main__":
