@@ -231,23 +231,19 @@ class Hamurabi:
         self.print_intro()
         while self.current_year < TURN_COUNT:
             self.print_status_report()
-            C=int(10*random())
-            cost_per_acre = C+17
+            cost_per_acre = int(10*random()) + 17
             acres_to_buy = self.query_acres_to_buy(cost_per_acre)
             if acres_to_buy != 0:
                 self.acres_owned = self.acres_owned + acres_to_buy
                 self.grain_holdings = self.grain_holdings - cost_per_acre * acres_to_buy
-                C=0
             else:
                 acres_to_sell = self.query_acres_to_sell()
                 self.acres_owned = self.acres_owned - acres_to_sell
                 self.grain_holdings = self.grain_holdings + cost_per_acre * acres_to_sell
-                C=0
             print()
 
             bushels_to_feed = self.query_bushels_to_feed()
             self.grain_holdings = self.grain_holdings - bushels_to_feed
-            C=1;print()
             self.query_acres_to_sow()
             self.compute_harvest()
             self.compute_new_population(bushels_to_feed)
