@@ -227,19 +227,29 @@ class Hamurabi:
         print(TERM_EVALUATION_GREAT)
         so_long()
 
+    def buy_land(self, cost_per_acre):
+        acres_to_buy = self.query_acres_to_buy(cost_per_acre)
+        if acres_to_buy != 0:
+            self.acres_owned = self.acres_owned + acres_to_buy
+            self.grain_holdings = self.grain_holdings - cost_per_acre * acres_to_buy
+            return acres_to_buy
+        else:
+            return 0
+
+    def sell_land(self, cost_per_acre):
+        acres_to_sell = self.query_acres_to_sell()
+        self.acres_owned = self.acres_owned - acres_to_sell
+        self.grain_holdings = self.grain_holdings + cost_per_acre * acres_to_sell
+
     def play(self):
         self.print_intro()
         while self.current_year < TURN_COUNT:
             self.print_status_report()
             cost_per_acre = int(10*random()) + 17
-            acres_to_buy = self.query_acres_to_buy(cost_per_acre)
-            if acres_to_buy != 0:
-                self.acres_owned = self.acres_owned + acres_to_buy
-                self.grain_holdings = self.grain_holdings - cost_per_acre * acres_to_buy
-            else:
-                acres_to_sell = self.query_acres_to_sell()
-                self.acres_owned = self.acres_owned - acres_to_sell
-                self.grain_holdings = self.grain_holdings + cost_per_acre * acres_to_sell
+            acres_to_buy = self.buy_land(cost_per_acre)
+            if acres_to_buy == 0:
+                self.sell_land(cost_per_acre)
+
             print()
 
             bushels_to_feed = self.query_bushels_to_feed()
